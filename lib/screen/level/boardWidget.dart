@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flips/controller/board/board.dart';
+import 'package:flips/model/board/board.dart';
 
 class _CellWidget extends StatelessWidget {
   final bool flipped;
@@ -16,12 +16,10 @@ class _CellWidget extends StatelessWidget {
     return Container(
       child: FlatButton(
         child: null,
-        color: flipped ? Colors.white : Colors.black,
+        color: flipped ? Colors.white : Colors.blue,
         onPressed: onPressed,
         shape: new RoundedRectangleBorder(), // Remove rounded borders.
       ),
-      decoration:
-          new BoxDecoration(border: new Border.all(color: Colors.black)),
       height: 50,
       margin: const EdgeInsets.all(2.0),
       width: 50,
@@ -34,6 +32,9 @@ class _BoardState extends State<BoardWidget> {
   static final _height = 6;
 
   final _board = Board(_width, _height);
+  final VoidCallback onCompleted;
+
+  _BoardState({this.onCompleted});
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +48,9 @@ class _BoardState extends State<BoardWidget> {
                         onPressed: () {
                           setState(() {
                             _board.flip(i, j);
+                            if (_board.isCompleted()) {
+                              onCompleted();
+                            }
                           });
                         }))
                     .toList(),
@@ -55,27 +59,14 @@ class _BoardState extends State<BoardWidget> {
           .toList(),
     );
   }
-
-  reset() {
-    setState(() {
-      _board.reset();
-    });
-  }
 }
 
 class BoardWidget extends StatefulWidget {
-
-  _BoardState state;
+  final VoidCallback onCompleted;
+  BoardWidget({this.onCompleted});
 
   @override
   State<StatefulWidget> createState() {
-    state = _BoardState();
-    return state;
-  }
-
-  reset() {
-    if (state != null) {
-      state.reset();
-    }
+    return _BoardState(onCompleted: onCompleted);
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 class Board {
-
   static final rng = new Random();
   static const RESET_ITERATIONS = 10;
 
@@ -14,9 +13,9 @@ class Board {
   final _board;
 
   Board(this._height, this._width)
-      : _board = List<List<bool>>.generate(_height,
-            (_) => List<bool>.generate(_width, (_) => false)) {
-      reset();
+      : _board = List<List<bool>>.generate(
+            _height, (_) => List<bool>.generate(_width, (_) => false)) {
+    reset();
   }
 
   get(int i, int j) {
@@ -42,6 +41,12 @@ class Board {
   }
 
   isCompleted() {
-    return this._board.every((row) => row.every());
+    int total = this._board.fold(0, (acc, row) {
+      return acc +
+          row.fold(0, (acc, cell) {
+            return acc + (cell ? 1 : 0);
+          });
+    });
+    return total == 0 || total == _width * _height;
   }
 }
