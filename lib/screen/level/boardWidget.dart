@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flips/model/board/board.dart';
 import 'package:flips/main/theme.dart';
 
-class _CellWidget extends StatelessWidget {
-  final bool flipped;
+class _CellState extends State<_CellWidget> {
+  bool flipped;
   final VoidCallback onPressed;
 
-  _CellWidget({
-    key: Key,
+  _CellState({
     this.flipped,
     this.onPressed,
-  }) : super(key: key);
+  });
+
+  setFlipped(bool newFlipped) {
+    setState(() {
+      flipped = newFlipped;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,46 +33,49 @@ class _CellWidget extends StatelessWidget {
   }
 }
 
-class _BoardState extends State<BoardWidget> {
+class _CellWidget extends StatefulWidget {
+  final _CellState _state;
+
+  _CellWidget({
+    flipped,
+    onPressed,
+  }) : _state = _CellState(flipped: flipped, onPressed: onPressed);
+
+  setFlipped(bool newFlipped) {
+    _state.setFlipped(newFlipped);
+  }
+
+  @override
+  State<StatefulWidget> createState() {
+    return _state;
+  }
+}
+
+class BoardWidget extends StatelessWidget {
   static final _width = 6;
   static final _height = 6;
 
   final _board = Board(_width, _height);
   final VoidCallback onCompleted;
 
-  _BoardState({this.onCompleted});
+  BoardWidget({this.onCompleted});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: new Iterable.generate(_height)
           .map((i) => Row(
-                children: new Iterable.generate(_width)
-                    .map((j) => _CellWidget(
-                        key: Key(i.toString() + ' ' + j.toString()),
-                        flipped: _board.get(i, j),
-                        onPressed: () {
-                          setState(() {
-                            _board.flip(i, j);
-                            if (_board.isCompleted()) {
-                              onCompleted();
-                            }
-                          });
-                        }))
-                    .toList(),
+                children: new Iterable.generate(_width).map((j) {
+                  final cell = _CellWidget(
+                    flipped: _board.get(i, j),
+                    onPressed: () => _board.flip(i, j),
+                  );
+                  _board.setListener(i, j, cell.setFlipped);
+                  return cell;
+                }).toList(),
                 mainAxisAlignment: MainAxisAlignment.center,
               ))
           .toList(),
     );
-  }
-}
-
-class BoardWidget extends StatefulWidget {
-  final VoidCallback onCompleted;
-  BoardWidget({this.onCompleted});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _BoardState(onCompleted: onCompleted);
   }
 }
