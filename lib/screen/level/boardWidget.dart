@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flips/model/board/board.dart';
+import 'package:flips/main/theme.dart';
 
 class _CellWidget extends StatelessWidget {
   final bool flipped;
@@ -16,7 +17,7 @@ class _CellWidget extends StatelessWidget {
     return Container(
       child: FlatButton(
         child: null,
-        color: flipped ? Colors.white : Colors.blue,
+        color: flipped ? flipsTheme.accentColor : flipsTheme.primaryColor,
         onPressed: onPressed,
         shape: new RoundedRectangleBorder(), // Remove rounded borders.
       ),

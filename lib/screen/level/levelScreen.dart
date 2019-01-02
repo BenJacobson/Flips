@@ -9,10 +9,11 @@ class LevelScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text("Level"),
       ),
-      backgroundColor: flipsTheme.primaryColor,
+      backgroundColor: flipsTheme.backgroundColor,
       body: Column(
         children: <Widget>[
-          Text("Level 1", style: TextStyle(color: Colors.white, fontSize: 32.0)),
+          Text("Level 1",
+              style: TextStyle(color: flipsTheme.accentColor, fontSize: 32.0)),
           SizedBox(height: 50),
           BoardWidget(
             onCompleted: () {

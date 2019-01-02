@@ -9,14 +9,14 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text("Flips"),
       ),
-      backgroundColor: flipsTheme.primaryColor,
+      backgroundColor: flipsTheme.backgroundColor,
       body: Center(
         child: Column(
           children: <Widget>[
             SizedBox(height: 50),
             Text("Flips",
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: flipsTheme.accentColor,
                   fontSize: 128.0,
                   fontStyle: FontStyle.italic,
                   fontWeight: FontWeight.bold,
@@ -24,8 +24,8 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 100),
             FlatButton(
               child: Text("Play",
-                  style: TextStyle(color: Colors.white, fontSize: 32.0)),
-              color: Colors.blue,
+                  style: TextStyle(color: flipsTheme.accentColor, fontSize: 32.0)),
+              color: flipsTheme.primaryColor,
               onPressed: () {
                 Navigator.push(
                   context,
