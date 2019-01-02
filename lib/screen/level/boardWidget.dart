@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flips/model/board/board.dart';
 import 'package:flips/main/theme.dart';
 
-class _CellState extends State<_CellWidget> {
+class _CellState extends State<_CellWidget> with TickerProviderStateMixin {
+  AnimationController controller;
+  Animation<double> animation;
   bool flipped;
+  double glowLevel = 0.0;
+  bool glowing = false;
+
   final VoidCallback onPressed;
+  final Color glowColor = Color(0xFFF9D77E);
 
   _CellState({
     this.flipped,
+    this.glowing,
     this.onPressed,
   });
 
@@ -17,12 +24,50 @@ class _CellState extends State<_CellWidget> {
     });
   }
 
+  setGlowing(bool newGlowing) {
+    setState(() {
+      glowing = newGlowing;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = AnimationController(
+        duration: const Duration(milliseconds: 1000), vsync: this);
+    animation = CurvedAnimation(parent: controller, curve: Curves.linear);
+
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        controller.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        controller.forward();
+      }
+    });
+
+    animation.addListener(() {
+      if (glowLevel != animation.value) {
+        setState(() {
+          glowLevel = animation.value;
+        });
+      }
+    });
+
+    controller.forward();
+  }
+
   @override
   Widget build(BuildContext context) {
+    var cellColor = flipped ? flipsTheme.accentColor : flipsTheme.primaryColor;
+    if (glowing) {
+      cellColor = Color.lerp(cellColor, glowColor, glowLevel);
+    }
+
     return Container(
       child: FlatButton(
         child: null,
-        color: flipped ? flipsTheme.accentColor : flipsTheme.primaryColor,
+        color: cellColor,
         onPressed: onPressed,
         shape: new RoundedRectangleBorder(), // Remove rounded borders.
       ),
@@ -31,6 +76,11 @@ class _CellState extends State<_CellWidget> {
       width: 50,
     );
   }
+
+  dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 }
 
 class _CellWidget extends StatefulWidget {
@@ -38,11 +88,20 @@ class _CellWidget extends StatefulWidget {
 
   _CellWidget({
     flipped,
+    glowing,
     onPressed,
-  }) : _state = _CellState(flipped: flipped, onPressed: onPressed);
+  }) : _state = _CellState(
+          flipped: flipped,
+          glowing: glowing,
+          onPressed: onPressed,
+        );
 
   setFlipped(bool newFlipped) {
     _state.setFlipped(newFlipped);
+  }
+
+  setGlowing(bool glowing) {
+    _state.setGlowing(glowing);
   }
 
   @override
@@ -63,19 +122,20 @@ class BoardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: new Iterable.generate(_height)
-          .map((i) => Row(
-                children: new Iterable.generate(_width).map((j) {
+      children: List<Row>.generate(
+          _height,
+          (i) => Row(
+                children: List<_CellWidget>.generate(_width, (j) {
                   final cell = _CellWidget(
                     flipped: _board.get(i, j),
+                    glowing: false,
                     onPressed: () => _board.flip(i, j),
                   );
                   _board.setListener(i, j, cell.setFlipped);
                   return cell;
-                }).toList(),
+                }),
                 mainAxisAlignment: MainAxisAlignment.center,
-              ))
-          .toList(),
+              )),
     );
   }
 }
