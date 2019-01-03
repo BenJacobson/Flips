@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flips/model/board/board.dart';
 import 'package:flips/main/theme.dart';
@@ -6,11 +7,11 @@ class _CellState extends State<_CellWidget> with TickerProviderStateMixin {
   AnimationController controller;
   Animation<double> animation;
   bool flipped;
-  double glowLevel = 0.0;
   bool glowing = false;
+  bool showHints = false;
+  double glowLevel = 0.0;
 
   final VoidCallback onPressed;
-  final Color glowColor = Color(0xFFF9D77E);
 
   _CellState({
     this.flipped,
@@ -19,15 +20,27 @@ class _CellState extends State<_CellWidget> with TickerProviderStateMixin {
   });
 
   setFlipped(bool newFlipped) {
-    setState(() {
-      flipped = newFlipped;
-    });
+    if (flipped != newFlipped) {
+      setState(() {
+        flipped = newFlipped;
+      });
+    }
   }
 
   setGlowing(bool newGlowing) {
-    setState(() {
-      glowing = newGlowing;
-    });
+    if (glowing != newGlowing) {
+      setState(() {
+        glowing = newGlowing;
+      });
+    }
+  }
+
+  setShowHints(bool newShowHints) {
+    if (showHints != newShowHints) {
+      setState(() {
+        showHints = newShowHints;
+      });
+    }
   }
 
   @override
@@ -60,15 +73,18 @@ class _CellState extends State<_CellWidget> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     var cellColor = flipped ? flipsTheme.accentColor : flipsTheme.primaryColor;
-    if (glowing) {
-      cellColor = Color.lerp(cellColor, glowColor, glowLevel);
+    if (glowing && showHints) {
+      cellColor = Color.lerp(cellColor, flipsTheme.hintColor, glowLevel);
     }
 
     return Container(
       child: FlatButton(
         child: null,
         color: cellColor,
-        onPressed: onPressed,
+        onPressed: () {
+          setGlowing(!glowing);
+          onPressed();
+        },
         shape: new RoundedRectangleBorder(), // Remove rounded borders.
       ),
       height: 50,
@@ -96,12 +112,16 @@ class _CellWidget extends StatefulWidget {
           onPressed: onPressed,
         );
 
-  setFlipped(bool newFlipped) {
+  set flipped(bool newFlipped) {
     _state.setFlipped(newFlipped);
   }
 
-  setGlowing(bool glowing) {
+  set glowing(bool glowing) {
     _state.setGlowing(glowing);
+  }
+
+  set showHints(bool value) {
+    _state.setShowHints(value);
   }
 
   @override
@@ -116,22 +136,47 @@ class BoardWidget extends StatelessWidget {
 
   final _board = Board(_width, _height);
   final VoidCallback onCompleted;
+  final List<_CellWidget> cells = List<_CellWidget>();
 
   BoardWidget({this.onCompleted});
 
+  setShowHints(showHints) {
+    cells.forEach((cell) => cell.showHints = showHints);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final solvers = _board.solve();
+    solvers.sort((Point<int> a, Point<int> b) {
+      if (a.y != b.y) {
+        return a.y - b.y;
+      }
+      return a.x - b.x;
+    });
+    int solversIndex = 0;
     return Column(
       children: List<Row>.generate(
           _height,
           (i) => Row(
                 children: List<_CellWidget>.generate(_width, (j) {
+                  bool solves = solversIndex < solvers.length &&
+                      solvers[solversIndex].x == j &&
+                      solvers[solversIndex].y == i;
+                  if (solves) {
+                    solversIndex++;
+                  }
                   final cell = _CellWidget(
                     flipped: _board.get(i, j),
-                    glowing: false,
-                    onPressed: () => _board.flip(i, j),
+                    glowing: solves,
+                    onPressed: () {
+                      _board.flip(i, j);
+                      if (_board.isCompleted()) {
+                        onCompleted();
+                      }
+                    },
                   );
-                  _board.setListener(i, j, cell.setFlipped);
+                  cells.add(cell);
+                  _board.setListener(i, j, (_) => cell.flipped = _);
                   return cell;
                 }),
                 mainAxisAlignment: MainAxisAlignment.center,

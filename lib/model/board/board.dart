@@ -31,12 +31,12 @@ class Board {
     _listeners[i][j] = cb;
   }
 
-  flip(int i, int j) {
-    for (int ii = i + _flipLow; ii <= i + _flipHigh; ++ii) {
-      for (int jj = j + _flipLow; jj <= j + _flipHigh; ++jj) {
-        if (0 <= ii && ii < _height && 0 <= jj && jj < _width) {
-          _board[ii][jj] = !_board[ii][jj];
-          _listeners[ii][jj](_board[ii][jj]);
+  flip(int iFlip, int jFlip) {
+    for (int i = iFlip + _flipLow; i <= iFlip + _flipHigh; ++i) {
+      for (int j = jFlip + _flipLow; j <= jFlip + _flipHigh; ++j) {
+        if (0 <= i && i < _height && 0 <= j && j < _width) {
+          _board[i][j] = !_board[i][j];
+          _listeners[i][j](_board[i][j]);
         }
       }
     }
@@ -58,5 +58,93 @@ class Board {
           });
     });
     return total == 0 || total == _width * _height;
+  }
+
+  /// Solves the game using Gaussian Elimination to determine which cells need
+  /// to be selected. Runtime complexity is O(([_width] * [_height])^3).
+  List<Point<int>> solve() {
+    int bits = _width * _height;
+    final matrix = List<List<bool>>.generate(
+        bits, (i) => List<bool>.generate(bits + 1, (j) => false));
+
+    // Set which cells need to be flipped in the far right column of the matrix.
+    for (int i = 0; i < _height; ++i) {
+      for (int j = 0; j < _width; ++j) {
+        if (_board[i][j]) {
+          int index = _coordsToIndex(i, j);
+          matrix[index][bits] = true;
+        }
+      }
+    }
+
+    // Set which cells flip when a given cell is selected. The column represents
+    // the selected cell and the row represents the flipped cell.
+    for (int iFlip = 0; iFlip < _height; ++iFlip) {
+      for (int jFlip = 0; jFlip < _width; ++jFlip) {
+        int selectedIndex = _coordsToIndex(iFlip, jFlip);
+        for (int i = iFlip + _flipLow; i <= iFlip + _flipHigh; ++i) {
+          for (int j = jFlip + _flipLow; j <= jFlip + _flipHigh; ++j) {
+            if (0 <= i && i < _height && 0 <= j && j < _width) {
+              int flippedIndex = _coordsToIndex(i, j);
+              matrix[flippedIndex][selectedIndex] = true;
+            }
+          }
+        }
+      }
+    }
+
+    // Forward elimination.
+    for (int j = 0; j < bits; ++j) {
+      // Find the next row that has the bit we want set and swap it with the
+      // current row.
+      for (int i = j; i < bits; ++i) {
+        if (matrix[i][j]) {
+          for (int k = 0; k <= bits; ++k) {
+            bool tmp = matrix[i][k];
+            matrix[i][k] = matrix[j][k];
+            matrix[j][k] = tmp;
+          }
+          break;
+        }
+      }
+      // Xor the current row with rows below that have the current bit set.
+      for (int i = j + 1; i < bits; ++i) {
+        if (matrix[i][j]) {
+          for (int k = 0; k <= bits; ++k) {
+            matrix[i][k] ^= matrix[j][k];
+          }
+        }
+      }
+    }
+
+    // Back substitution.
+    for (int i = bits - 1; i >= 0; --i) {
+      for (int j = bits - 1; j > i; --j) {
+        if (matrix[i][j]) {
+          matrix[i][j] ^= matrix[j][j];
+          matrix[i][bits] ^= matrix[j][bits];
+        }
+      }
+    }
+
+    final ans = List<Point<int>>();
+    for (int i = 0; i < bits; ++i) {
+      if (matrix[i][bits]) {
+        ans.add(Point(_indexToJCoord(i), _indexToICoord(i)));
+      }
+    }
+    return ans;
+  }
+
+  int _coordsToIndex(int i, int j) {
+    return i * _width + j;
+  }
+
+  int _indexToICoord(int index) {
+    return index ~/ _width;
+  }
+
+  int _indexToJCoord(int index) {
+    return index % _width;
   }
 }

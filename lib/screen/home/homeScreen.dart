@@ -24,7 +24,8 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 100),
             FlatButton(
               child: Text("Play",
-                  style: TextStyle(color: flipsTheme.accentColor, fontSize: 32.0)),
+                  style:
+                      TextStyle(color: flipsTheme.accentColor, fontSize: 32.0)),
               color: flipsTheme.primaryColor,
               onPressed: () {
                 Navigator.push(
