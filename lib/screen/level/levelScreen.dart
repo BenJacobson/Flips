@@ -10,6 +10,7 @@ class LevelScreen extends StatelessWidget {
     final boardWidget = BoardWidget(
       onCompleted: () {
         showDialog(
+          barrierDismissible: false,
           context: context,
           builder: buildLevelCompleteDialog,
         );
@@ -42,15 +43,15 @@ class LevelScreen extends StatelessWidget {
     return AlertDialog(
       actions: <Widget>[
         FlatButton(
-          child: Text('Continue'),
+          child: Text('No'),
           onPressed: () {
             Navigator.of(context).pop(); // Pop the dialog.
             Navigator.of(context).pop(); // Pop the level screen.
           },
         ),
       ],
-      content: Text("contents"),
-      title: Text("Level Completed!"),
+      content: Text("Play Again?"),
+      title: Text("Level Complete!"),
     );
   }
 }
