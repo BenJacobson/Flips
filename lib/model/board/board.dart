@@ -1,10 +1,19 @@
 import 'dart:math';
 
-typedef FlippedCallback = void Function(bool);
+typedef FlippedCallback = void Function(bool, bool);
+
+class _Cell {
+  bool flipped;
+  bool selected;
+  FlippedCallback listener;
+
+  _Cell({this.flipped = false, this.selected = false, this.listener});
+}
 
 class Board {
   static final rng = new Random();
-  static const RESET_ITERATIONS = 10;
+  static const RESET_ITERATIONS_MIN = 10;
+  static const RESET_ITERATIONS_MAX = 20;
 
   final _height;
   final _width;
@@ -12,38 +21,37 @@ class Board {
   final _flipLow = -1;
   final _flipHigh = 1;
 
-  final _board;
-  final _listeners;
+  final List<List<_Cell>> _board;
 
   Board(this._height, this._width)
-      : _board = List<List<bool>>.generate(
-            _height, (_) => List<bool>.generate(_width, (_) => false)),
-        _listeners = List<List<FlippedCallback>>.generate(_height,
-            (_) => List<FlippedCallback>.generate(_width, (_) => (_) {})) {
-    reset();
-  }
+      : _board = List<List<_Cell>>.generate(
+            _height, (_) => List<_Cell>.generate(_width, (_) => _Cell()));
 
-  get(int i, int j) {
-    return _board[i][j];
+  getFlipped(int i, int j) {
+    return _board[i][j].flipped;
   }
 
   setListener(int i, int j, FlippedCallback cb) {
-    _listeners[i][j] = cb;
+    _board[i][j].listener = cb;
   }
 
   flip(int iFlip, int jFlip) {
     for (int i = iFlip + _flipLow; i <= iFlip + _flipHigh; ++i) {
       for (int j = jFlip + _flipLow; j <= jFlip + _flipHigh; ++j) {
         if (0 <= i && i < _height && 0 <= j && j < _width) {
-          _board[i][j] = !_board[i][j];
-          _listeners[i][j](_board[i][j]);
+          _board[i][j].flipped = !_board[i][j].flipped;
+          _board[i][j].selected =
+              _board[i][j].selected ^ (i == iFlip && j == jFlip);
+          _board[i][j].listener(_board[i][j].flipped, _board[i][j].selected);
         }
       }
     }
   }
 
   reset() {
-    for (int rep = 0; rep < RESET_ITERATIONS; ++rep) {
+    final iterations = RESET_ITERATIONS_MIN +
+        rng.nextInt(RESET_ITERATIONS_MAX - RESET_ITERATIONS_MIN);
+    for (int rep = 0; rep < iterations; ++rep) {
       int i = rng.nextInt(_height);
       int j = rng.nextInt(_width);
       flip(i, j);
@@ -51,13 +59,7 @@ class Board {
   }
 
   isCompleted() {
-    int total = this._board.fold(0, (acc, row) {
-      return acc +
-          row.fold(0, (acc, cell) {
-            return acc + (cell ? 1 : 0);
-          });
-    });
-    return total == 0 || total == _width * _height;
+    return _board.every((row) => row.every((cell) => !cell.flipped));
   }
 
   /// Solves the game using Gaussian Elimination to determine which cells need
@@ -70,7 +72,7 @@ class Board {
     // Set which cells need to be flipped in the far right column of the matrix.
     for (int i = 0; i < _height; ++i) {
       for (int j = 0; j < _width; ++j) {
-        if (_board[i][j]) {
+        if (_board[i][j].flipped) {
           int index = _coordsToIndex(i, j);
           matrix[index][bits] = true;
         }

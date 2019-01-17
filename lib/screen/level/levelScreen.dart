@@ -62,25 +62,30 @@ class _ShowHintsState extends State<_ShowHintsWidget> {
 
   _ShowHintsState(this.showHintsChanged);
 
+  _setShowHints(newShowHints) {
+    if (newShowHints != _showHints) {
+      setState(() {
+        _showHints = newShowHints;
+        showHintsChanged(_showHints);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Switch(
-          onChanged: (bool value) {
-            if (_showHints != value) {
-              showHintsChanged(value);
-              setState(() {
-                _showHints = value;
-              });
-            }
-          },
-          value: _showHints,
-        ),
-        Text("Show hints",
-            style: TextStyle(color: flipsTheme.accentColor, fontSize: 24)),
-      ],
-      mainAxisAlignment: MainAxisAlignment.center,
+    return GestureDetector(
+      child: Row(
+        children: [
+          Switch(
+            onChanged: _setShowHints,
+            value: _showHints,
+          ),
+          Text("Show hints",
+              style: TextStyle(color: flipsTheme.accentColor, fontSize: 24)),
+        ],
+        mainAxisAlignment: MainAxisAlignment.center,
+      ),
+      onTap: () => _setShowHints(!_showHints),
     );
   }
 }

@@ -1,12 +1,12 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flips/model/board/board.dart';
 import 'package:flips/main/theme.dart';
+import 'package:flutter/scheduler.dart';
 
 class _CellState extends State<_CellWidget> with TickerProviderStateMixin {
   AnimationController controller;
   Animation<double> animation;
-  bool flipped;
+  bool flipped = false;
   bool glowing = false;
   bool showHints = false;
   double glowLevel = 0.0;
@@ -14,8 +14,6 @@ class _CellState extends State<_CellWidget> with TickerProviderStateMixin {
   final VoidCallback onPressed;
 
   _CellState({
-    this.flipped,
-    this.glowing,
     this.onPressed,
   });
 
@@ -27,18 +25,18 @@ class _CellState extends State<_CellWidget> with TickerProviderStateMixin {
     }
   }
 
-  setGlowing(bool newGlowing) {
-    if (glowing != newGlowing) {
-      setState(() {
-        glowing = newGlowing;
-      });
-    }
-  }
-
   setShowHints(bool newShowHints) {
     if (showHints != newShowHints) {
       setState(() {
         showHints = newShowHints;
+      });
+    }
+  }
+
+  setSelected(bool newSelected) {
+    if (glowing != newSelected) {
+      setState(() {
+        glowing = newSelected;
       });
     }
   }
@@ -81,10 +79,7 @@ class _CellState extends State<_CellWidget> with TickerProviderStateMixin {
       child: FlatButton(
         child: null,
         color: cellColor,
-        onPressed: () {
-          setGlowing(!glowing);
-          onPressed();
-        },
+        onPressed: onPressed,
         shape: new RoundedRectangleBorder(), // Remove rounded borders.
       ),
       height: 50,
@@ -103,25 +98,21 @@ class _CellWidget extends StatefulWidget {
   final _CellState _state;
 
   _CellWidget({
-    flipped,
-    glowing,
     onPressed,
   }) : _state = _CellState(
-          flipped: flipped,
-          glowing: glowing,
           onPressed: onPressed,
         );
 
-  set flipped(bool newFlipped) {
+  setFlipped(bool newFlipped) {
     _state.setFlipped(newFlipped);
   }
 
-  set glowing(bool glowing) {
-    _state.setGlowing(glowing);
+  setSelected(newSelected) {
+    _state.setSelected(newSelected);
   }
 
-  set showHints(bool value) {
-    _state.setShowHints(value);
+  setShowHints(bool newShowHints) {
+    _state.setShowHints(newShowHints);
   }
 
   @override
@@ -141,46 +132,35 @@ class BoardWidget extends StatelessWidget {
   BoardWidget({this.onCompleted});
 
   setShowHints(showHints) {
-    cells.forEach((cell) => cell.showHints = showHints);
+    cells.forEach((cell) => cell.setShowHints(showHints));
   }
 
   @override
   Widget build(BuildContext context) {
-    final solvers = _board.solve();
-    solvers.sort((Point<int> a, Point<int> b) {
-      if (a.y != b.y) {
-        return a.y - b.y;
-      }
-      return a.x - b.x;
-    });
-    int solversIndex = 0;
+    SchedulerBinding.instance
+        .scheduleFrameCallback((timestamp) => _board.reset());
     return Column(
-      children: List<Row>.generate(
-          _height,
-          (i) => Row(
-                children: List<_CellWidget>.generate(_width, (j) {
-                  bool solves = solversIndex < solvers.length &&
-                      solvers[solversIndex].x == j &&
-                      solvers[solversIndex].y == i;
-                  if (solves) {
-                    solversIndex++;
-                  }
-                  final cell = _CellWidget(
-                    flipped: _board.get(i, j),
-                    glowing: solves,
-                    onPressed: () {
-                      _board.flip(i, j);
-                      if (_board.isCompleted()) {
-                        onCompleted();
-                      }
-                    },
-                  );
-                  cells.add(cell);
-                  _board.setListener(i, j, (_) => cell.flipped = _);
-                  return cell;
-                }),
-                mainAxisAlignment: MainAxisAlignment.center,
-              )),
+      children: List<Row>.generate(_height, (i) {
+        return Row(
+          children: List<_CellWidget>.generate(_width, (j) {
+            final cell = _CellWidget(
+              onPressed: () {
+                _board.flip(i, j);
+                if (_board.isCompleted()) {
+                  onCompleted();
+                }
+              },
+            );
+            cells.add(cell);
+            _board.setListener(i, j, (flipped, selected) {
+              cell.setFlipped(flipped);
+              cell.setSelected(selected);
+            });
+            return cell;
+          }),
+          mainAxisAlignment: MainAxisAlignment.center,
+        );
+      }),
     );
   }
 }
