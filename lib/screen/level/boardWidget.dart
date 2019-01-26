@@ -1,166 +1,152 @@
-import 'package:flutter/material.dart';
-import 'package:flips/model/board/board.dart';
+import 'package:flips/screen/level/boardBloc.dart';
+import 'package:flips/screen/level/events.dart';
 import 'package:flips/main/theme.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-class _CellState extends State<_CellWidget> with TickerProviderStateMixin {
-  AnimationController controller;
-  Animation<double> animation;
-  bool flipped = false;
-  bool glowing = false;
-  bool showHints = false;
-  double glowLevel = 0.0;
-
-  final VoidCallback onPressed;
-
-  _CellState({
-    this.onPressed,
-  });
-
-  setFlipped(bool newFlipped) {
-    if (flipped != newFlipped) {
-      setState(() {
-        flipped = newFlipped;
-      });
-    }
+class BoardWidget extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _BoardState();
   }
+}
 
-  setShowHints(bool newShowHints) {
-    if (showHints != newShowHints) {
-      setState(() {
-        showHints = newShowHints;
-      });
-    }
-  }
-
-  setSelected(bool newSelected) {
-    if (glowing != newSelected) {
-      setState(() {
-        glowing = newSelected;
-      });
-    }
-  }
+class _BoardState extends State<BoardWidget>
+    with SingleTickerProviderStateMixin {
+  AnimationController animationController;
+  Animation animation;
 
   @override
   void initState() {
     super.initState();
 
-    controller = AnimationController(
+    animationController = AnimationController(
         duration: const Duration(milliseconds: 1000), vsync: this);
-    animation = CurvedAnimation(parent: controller, curve: Curves.linear);
+
+    animation =
+        CurvedAnimation(parent: animationController, curve: Curves.linear);
 
     animation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        controller.reverse();
+        animationController.reverse();
       } else if (status == AnimationStatus.dismissed) {
-        controller.forward();
+        animationController.forward();
       }
     });
 
-    animation.addListener(() {
-      if (glowLevel != animation.value) {
-        setState(() {
-          glowLevel = animation.value;
-        });
-      }
-    });
-
-    controller.forward();
+    animationController.forward();
   }
 
   @override
   Widget build(BuildContext context) {
-    var cellColor = flipped ? flipsTheme.accentColor : flipsTheme.primaryColor;
-    if (glowing && showHints) {
-      cellColor = Color.lerp(cellColor, flipsTheme.hintColor, glowLevel);
-    }
-
-    return Container(
-      child: FlatButton(
-        child: null,
-        color: cellColor,
-        onPressed: onPressed,
-        shape: new RoundedRectangleBorder(), // Remove rounded borders.
-      ),
-      height: 50,
-      margin: const EdgeInsets.all(2.0),
-      width: 50,
-    );
-  }
-
-  dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-}
-
-class _CellWidget extends StatefulWidget {
-  final _CellState _state;
-
-  _CellWidget({
-    onPressed,
-  }) : _state = _CellState(
-          onPressed: onPressed,
-        );
-
-  setFlipped(bool newFlipped) {
-    _state.setFlipped(newFlipped);
-  }
-
-  setSelected(newSelected) {
-    _state.setSelected(newSelected);
-  }
-
-  setShowHints(bool newShowHints) {
-    _state.setShowHints(newShowHints);
-  }
-
-  @override
-  State<StatefulWidget> createState() {
-    return _state;
-  }
-}
-
-class BoardWidget extends StatelessWidget {
-  static final _width = 6;
-  static final _height = 6;
-
-  final _board = Board(_width, _height);
-  final VoidCallback onCompleted;
-  final List<_CellWidget> cells = List<_CellWidget>();
-
-  BoardWidget({this.onCompleted});
-
-  setShowHints(showHints) {
-    cells.forEach((cell) => cell.setShowHints(showHints));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    SchedulerBinding.instance
-        .scheduleFrameCallback((timestamp) => _board.reset());
+    BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
     return Column(
-      children: List<Row>.generate(_height, (i) {
+      children: List<Row>.generate(boardBloc.height, (i) {
         return Row(
-          children: List<_CellWidget>.generate(_width, (j) {
-            final cell = _CellWidget(
-              onPressed: () {
-                _board.flip(i, j);
-                if (_board.isCompleted()) {
-                  onCompleted();
-                }
-              },
-            );
-            cells.add(cell);
-            _board.setListener(i, j, (flipped, selected) {
-              cell.setFlipped(flipped);
-              cell.setSelected(selected);
-            });
-            return cell;
+          children: List<_CellWidget>.generate(boardBloc.width, (j) {
+            return _CellWidget(i, j, hintAnimation: animation);
           }),
           mainAxisAlignment: MainAxisAlignment.center,
         );
       }),
     );
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+}
+
+class _CellWidget extends StatefulWidget {
+  final int i;
+  final int j;
+  final Animation<double> hintAnimation;
+
+  _CellWidget(this.i, this.j, {this.hintAnimation});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _CellState(i, j, hintAnimation: hintAnimation);
+  }
+}
+
+class _CellState extends State<_CellWidget> {
+  final int i;
+  final int j;
+  final Animation<double> hintAnimation;
+
+  BoardBloc _boardBloc;
+
+  bool _flipped = false;
+  bool _selected = false;
+  bool _showHint = false;
+
+  _CellState(this.i, this.j, {this.hintAnimation});
+
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.scheduleFrameCallback((timeStamp) {
+      _boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
+
+      _boardBloc.boardStream.listen((board) {
+        bool newFlipped = board.getFlipped(i, j);
+        bool newSelected = board.getSelected(i, j);
+
+        if (newFlipped != _flipped) {
+          setState(() {
+            _flipped = newFlipped;
+          });
+        }
+
+        if (newSelected != _selected) {
+          setState(() {
+            _selected = newSelected;
+          });
+        }
+      });
+
+
+      _boardBloc.showHintsStream.listen((newShowHints) {
+        if (newShowHints != _showHint) {
+          setState(() {
+            _showHint = newShowHints;
+          });
+        }
+      });
+
+      hintAnimation.addListener(() {
+        if (_selected && _showHint) {
+          setState(() {});
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Color cellColor =
+        _flipped ? flipsTheme.accentColor : flipsTheme.primaryColor;
+    if (_selected && _showHint) {
+      cellColor =
+          Color.lerp(cellColor, flipsTheme.hintColor, hintAnimation.value);
+    }
+    return GestureDetector(
+      child: Container(
+        color: cellColor,
+        height: 50,
+        margin: const EdgeInsets.all(2.0),
+        width: 50,
+      ),
+      onTap: () => _boardBloc.eventSink.add(FlipEvent(i, j)),
+    );
+  }
+
+  @override
+  void didUpdateWidget(_CellWidget oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
   }
 }

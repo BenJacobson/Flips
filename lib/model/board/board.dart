@@ -5,55 +5,58 @@ typedef FlippedCallback = void Function(bool, bool);
 class _Cell {
   bool flipped;
   bool selected;
-  FlippedCallback listener;
 
-  _Cell({this.flipped = false, this.selected = false, this.listener});
+  _Cell({this.flipped = false, this.selected = false});
 }
 
-class Board {
-  static final rng = new Random();
-  static const RESET_ITERATIONS_MIN = 10;
-  static const RESET_ITERATIONS_MAX = 20;
+abstract class ImmutableBoard {
+  bool getFlipped(int i, int j);
+  bool getSelected(int i, int j);
+  bool isCompleted();
+}
 
-  final _height;
-  final _width;
+class Board implements ImmutableBoard {
+  static final _rng = new Random();
+  static const _RESET_ITERATIONS_MIN = 10;
+  static const _RESET_ITERATIONS_MAX = 20;
 
-  final _flipLow = -1;
-  final _flipHigh = 1;
+  final int height;
+  final int width;
+
+  final int _flipLow = -1;
+  final int _flipHigh = 1;
 
   final List<List<_Cell>> _board;
 
-  Board(this._height, this._width)
+  Board(this.height, this.width)
       : _board = List<List<_Cell>>.generate(
-            _height, (_) => List<_Cell>.generate(_width, (_) => _Cell()));
+            height, (_) => List<_Cell>.generate(width, (_) => _Cell()));
 
-  getFlipped(int i, int j) {
+  bool getFlipped(int i, int j) {
     return _board[i][j].flipped;
   }
 
-  setListener(int i, int j, FlippedCallback cb) {
-    _board[i][j].listener = cb;
+  bool getSelected(int i, int j) {
+    return _board[i][j].selected;
   }
 
   flip(int iFlip, int jFlip) {
+    _board[iFlip][jFlip].selected = !_board[iFlip][jFlip].selected;
     for (int i = iFlip + _flipLow; i <= iFlip + _flipHigh; ++i) {
       for (int j = jFlip + _flipLow; j <= jFlip + _flipHigh; ++j) {
-        if (0 <= i && i < _height && 0 <= j && j < _width) {
+        if (0 <= i && i < height && 0 <= j && j < width) {
           _board[i][j].flipped = !_board[i][j].flipped;
-          _board[i][j].selected =
-              _board[i][j].selected ^ (i == iFlip && j == jFlip);
-          _board[i][j].listener(_board[i][j].flipped, _board[i][j].selected);
         }
       }
     }
   }
 
   reset() {
-    final iterations = RESET_ITERATIONS_MIN +
-        rng.nextInt(RESET_ITERATIONS_MAX - RESET_ITERATIONS_MIN);
+    final iterations = _RESET_ITERATIONS_MIN +
+        _rng.nextInt(_RESET_ITERATIONS_MAX - _RESET_ITERATIONS_MIN);
     for (int rep = 0; rep < iterations; ++rep) {
-      int i = rng.nextInt(_height);
-      int j = rng.nextInt(_width);
+      int i = _rng.nextInt(height);
+      int j = _rng.nextInt(width);
       flip(i, j);
     }
   }
@@ -63,15 +66,15 @@ class Board {
   }
 
   /// Solves the game using Gaussian Elimination to determine which cells need
-  /// to be selected. Runtime complexity is O(([_width] * [_height])^3).
+  /// to be selected. Runtime complexity is O(([width] * [height])^3).
   List<Point<int>> solve() {
-    int bits = _width * _height;
+    int bits = width * height;
     final matrix = List<List<bool>>.generate(
         bits, (i) => List<bool>.generate(bits + 1, (j) => false));
 
     // Set which cells need to be flipped in the far right column of the matrix.
-    for (int i = 0; i < _height; ++i) {
-      for (int j = 0; j < _width; ++j) {
+    for (int i = 0; i < height; ++i) {
+      for (int j = 0; j < width; ++j) {
         if (_board[i][j].flipped) {
           int index = _coordsToIndex(i, j);
           matrix[index][bits] = true;
@@ -81,12 +84,12 @@ class Board {
 
     // Set which cells flip when a given cell is selected. The column represents
     // the selected cell and the row represents the flipped cell.
-    for (int iFlip = 0; iFlip < _height; ++iFlip) {
-      for (int jFlip = 0; jFlip < _width; ++jFlip) {
+    for (int iFlip = 0; iFlip < height; ++iFlip) {
+      for (int jFlip = 0; jFlip < width; ++jFlip) {
         int selectedIndex = _coordsToIndex(iFlip, jFlip);
         for (int i = iFlip + _flipLow; i <= iFlip + _flipHigh; ++i) {
           for (int j = jFlip + _flipLow; j <= jFlip + _flipHigh; ++j) {
-            if (0 <= i && i < _height && 0 <= j && j < _width) {
+            if (0 <= i && i < height && 0 <= j && j < width) {
               int flippedIndex = _coordsToIndex(i, j);
               matrix[flippedIndex][selectedIndex] = true;
             }
@@ -139,14 +142,14 @@ class Board {
   }
 
   int _coordsToIndex(int i, int j) {
-    return i * _width + j;
+    return i * width + j;
   }
 
   int _indexToICoord(int index) {
-    return index ~/ _width;
+    return index ~/ width;
   }
 
   int _indexToJCoord(int index) {
-    return index % _width;
+    return index % width;
   }
 }
