@@ -36,7 +36,7 @@ class _Level extends StatelessWidget {
         BoardWidget(),
         SizedBox(height: 50),
         _ShowHintsWidget(),
-        CompletedDialog(),
+        _CompletedDialog(),
       ],
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -46,7 +46,7 @@ class _Level extends StatelessWidget {
 
 // A dummy widget used only to get a BuildContext for the level completed
 // dialog.
-class CompletedDialog extends StatelessWidget {
+class _CompletedDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;

@@ -26,15 +26,26 @@ class _BoardState extends State<BoardWidget>
     animation =
         CurvedAnimation(parent: animationController, curve: Curves.linear);
 
+    bool showingHints = false;
     animation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         animationController.reverse();
-      } else if (status == AnimationStatus.dismissed) {
+      } else if (status == AnimationStatus.dismissed && showingHints) {
         animationController.forward();
       }
     });
 
-    animationController.forward();
+    SchedulerBinding.instance.scheduleFrameCallback((timeStamp) {
+      BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
+      boardBloc.showHintsStream.listen((showHints) {
+        showingHints = showHints;
+        if (showHints) {
+          animationController.forward();
+        } else {
+          animationController.reset();
+        }
+      });
+    });
   }
 
   @override

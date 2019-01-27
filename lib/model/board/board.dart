@@ -1,14 +1,5 @@
 import 'dart:math';
 
-typedef FlippedCallback = void Function(bool, bool);
-
-class _Cell {
-  bool flipped;
-  bool selected;
-
-  _Cell({this.flipped = false, this.selected = false});
-}
-
 abstract class ImmutableBoard {
   bool getFlipped(int i, int j);
   bool getSelected(int i, int j);
@@ -152,4 +143,11 @@ class Board implements ImmutableBoard {
   int _indexToJCoord(int index) {
     return index % width;
   }
+}
+
+class _Cell {
+  bool flipped;
+  bool selected;
+
+  _Cell({this.flipped = false, this.selected = false});
 }
