@@ -55,7 +55,8 @@ class _BoardState extends State<BoardWidget>
       children: List<Row>.generate(boardBloc.height, (i) {
         return Row(
           children: List<_CellWidget>.generate(boardBloc.width, (j) {
-            return _CellWidget(i, j, hintAnimation: animation);
+            return _CellWidget(i, j,
+                color: boardBloc.getColor(i, j), hintAnimation: animation);
           }),
           mainAxisAlignment: MainAxisAlignment.center,
         );
@@ -73,19 +74,22 @@ class _BoardState extends State<BoardWidget>
 class _CellWidget extends StatefulWidget {
   final int i;
   final int j;
+  final Color color;
   final Animation<double> hintAnimation;
 
-  _CellWidget(this.i, this.j, {this.hintAnimation});
+  _CellWidget(this.i, this.j,
+      {@required this.color, @required this.hintAnimation});
 
   @override
   State<StatefulWidget> createState() {
-    return _CellState(i, j, hintAnimation: hintAnimation);
+    return _CellState(i, j, color: color, hintAnimation: hintAnimation);
   }
 }
 
 class _CellState extends State<_CellWidget> {
   final int i;
   final int j;
+  final Color color;
   final Animation<double> hintAnimation;
 
   BoardBloc _boardBloc;
@@ -94,7 +98,8 @@ class _CellState extends State<_CellWidget> {
   bool _selected = false;
   bool _showHint = false;
 
-  _CellState(this.i, this.j, {this.hintAnimation});
+  _CellState(this.i, this.j,
+      {@required this.color, @required this.hintAnimation});
 
   @override
   void initState() {
@@ -119,7 +124,6 @@ class _CellState extends State<_CellWidget> {
         }
       });
 
-
       _boardBloc.showHintsStream.listen((newShowHints) {
         if (newShowHints != _showHint) {
           setState(() {
@@ -138,8 +142,7 @@ class _CellState extends State<_CellWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Color cellColor =
-        _flipped ? flipsTheme.accentColor : flipsTheme.primaryColor;
+    Color cellColor = _flipped ? flipsTheme.accentColor : color;
     if (_selected && _showHint) {
       cellColor =
           Color.lerp(cellColor, flipsTheme.hintColor, hintAnimation.value);
@@ -153,11 +156,5 @@ class _CellState extends State<_CellWidget> {
       ),
       onTap: () => _boardBloc.eventSink.add(FlipEvent(i, j)),
     );
-  }
-
-  @override
-  void didUpdateWidget(_CellWidget oldWidget) {
-    // TODO: implement didUpdateWidget
-    super.didUpdateWidget(oldWidget);
   }
 }

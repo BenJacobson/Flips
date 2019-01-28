@@ -1,3 +1,6 @@
+import 'package:flips/model/board/cell.dart';
+import 'package:flutter/material.dart';
+
 import 'dart:math';
 
 abstract class ImmutableBoard {
@@ -17,11 +20,15 @@ class Board implements ImmutableBoard {
   final int _flipLow = -1;
   final int _flipHigh = 1;
 
-  final List<List<_Cell>> _board;
+  final List<List<Cell>> _board;
 
   Board(this.height, this.width)
-      : _board = List<List<_Cell>>.generate(
-            height, (_) => List<_Cell>.generate(width, (_) => _Cell()));
+      : _board = List<List<Cell>>.generate(
+            height, (_) => List<Cell>.generate(width, (_) => BlueCell()));
+
+  Color getColor(int i, int j) {
+    return _board[i][j].color;
+  }
 
   bool getFlipped(int i, int j) {
     return _board[i][j].flipped;
@@ -143,11 +150,4 @@ class Board implements ImmutableBoard {
   int _indexToJCoord(int index) {
     return index % width;
   }
-}
-
-class _Cell {
-  bool flipped;
-  bool selected;
-
-  _Cell({this.flipped = false, this.selected = false});
 }

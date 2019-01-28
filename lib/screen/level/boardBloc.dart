@@ -30,6 +30,8 @@ class BoardBloc {
     _eventStream.listen(_transform);
   }
 
+  Color getColor(int i, int j) => _board.getColor(i, j);
+
   _transform(BoardEvent event) {
     if (event is FlipEvent) {
       _board.flip(event.i, event.j);

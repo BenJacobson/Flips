@@ -11,7 +11,7 @@ class LevelScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Level"),
+        title: Text("Free Play"),
       ),
       backgroundColor: flipsTheme.backgroundColor,
       body: BoardBlocInheritedWidget(
@@ -30,9 +30,6 @@ class _Level extends StatelessWidget {
         (timestamp) => boardBloc.eventSink.add(ResetEvent()));
     return Column(
       children: <Widget>[
-        Text("Level 1",
-            style: TextStyle(color: flipsTheme.accentColor, fontSize: 32.0)),
-        SizedBox(height: 50),
         BoardWidget(),
         SizedBox(height: 50),
         _ShowHintsWidget(),
