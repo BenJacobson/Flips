@@ -1,4 +1,5 @@
 import 'package:flips/model/board/cell.dart';
+import 'package:flips/model/board/coordinate.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:math';
@@ -11,42 +12,39 @@ abstract class ImmutableBoard {
 
 class Board implements ImmutableBoard {
   static final _rng = new Random();
-  static const _RESET_ITERATIONS_MIN = 10;
-  static const _RESET_ITERATIONS_MAX = 20;
+  static const _RESET_ITERATIONS_MIN = 8;
+  static const _RESET_ITERATIONS_MAX = 14;
 
   final int height;
   final int width;
 
-  final int _flipLow = -1;
-  final int _flipHigh = 1;
+  List<List<Cell>> _board;
 
-  final List<List<Cell>> _board;
-
-  Board(this.height, this.width)
-      : _board = List<List<Cell>>.generate(
-            height, (_) => List<Cell>.generate(width, (_) => BlueCell()));
+  Board(this.height, this.width) {
+    reset();
+  }
 
   Color getColor(int i, int j) => _board[i][j].color;
 
   bool getFlipped(int i, int j) => _board[i][j].flipped;
 
-  Iterable<int> getFlips(int i, int j) =>
+  Iterable<Coordinate> getFlips(int i, int j) =>
       _board[i][j].flips(i, j, width, height);
 
   bool getSelected(int i, int j) => _board[i][j].selected;
 
   flip(int iFlip, int jFlip) {
     _board[iFlip][jFlip].selected = !_board[iFlip][jFlip].selected;
-    for (int i = iFlip + _flipLow; i <= iFlip + _flipHigh; ++i) {
-      for (int j = jFlip + _flipLow; j <= jFlip + _flipHigh; ++j) {
-        if (0 <= i && i < height && 0 <= j && j < width) {
-          _board[i][j].flipped = !_board[i][j].flipped;
-        }
+    for (Coordinate coord in getFlips(iFlip, jFlip)) {
+      if (0 <= coord.i && coord.i < height && 0 <= coord.j && coord.j < width) {
+        _board[coord.i][coord.j].flipped = !_board[coord.i][coord.j].flipped;
       }
     }
   }
 
   reset() {
+    _board = List<List<Cell>>.generate(
+        height, (_) => List<Cell>.generate(width, (_) => _newRandomCell()));
     final iterations = _RESET_ITERATIONS_MIN +
         _rng.nextInt(_RESET_ITERATIONS_MAX - _RESET_ITERATIONS_MIN);
     for (int rep = 0; rep < iterations; ++rep) {
@@ -58,5 +56,16 @@ class Board implements ImmutableBoard {
 
   isCompleted() {
     return _board.every((row) => row.every((cell) => !cell.flipped));
+  }
+
+  Cell _newRandomCell() {
+    final val = _rng.nextDouble();
+    if (val < 0.2) {
+      return GreenCell();
+    } else if (val < 0.4) {
+      return RedCell();
+    } else {
+      return BlueCell();
+    }
   }
 }

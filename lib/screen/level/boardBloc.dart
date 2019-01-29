@@ -39,6 +39,9 @@ class BoardBloc {
     } else if (event is HintsEvent) {
       _showHints = event.showHints;
       _showHintsSink.add(_showHints);
+    } else if (event is PushEvent) {
+      _showHintsSink.add(_showHints);
+      _boardSink.add(_board);
     } else if (event is ResetEvent) {
       _showHints = false;
       _showHintsSink.add(_showHints);

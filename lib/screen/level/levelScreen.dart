@@ -27,7 +27,7 @@ class _Level extends StatelessWidget {
   Widget build(BuildContext context) {
     BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
     SchedulerBinding.instance.scheduleFrameCallback(
-        (timestamp) => boardBloc.eventSink.add(ResetEvent()));
+        (timestamp) => boardBloc.eventSink.add(PushEvent()));
     return Column(
       children: <Widget>[
         BoardWidget(),

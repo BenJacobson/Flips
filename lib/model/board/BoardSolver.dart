@@ -1,13 +1,10 @@
 import 'package:flips/model/board/board.dart';
 import 'package:flips/model/board/coordinate.dart';
 
-import 'dart:math';
-
 class BoardSolver {
-
   /// Solves the board using Gaussian Elimination to determine which cells need
   /// to be selected. The runtime complexity is O(([width] * [height])^3).
-  static List<Point<int>> solve(Board board) {
+  static List<Coordinate> solve(Board board) {
     int bits = board.width * board.height;
     final matrix = List<List<bool>>.generate(
         bits, (i) => List<bool>.generate(bits + 1, (j) => false));
@@ -16,7 +13,7 @@ class BoardSolver {
     for (int i = 0; i < board.height; ++i) {
       for (int j = 0; j < board.width; ++j) {
         if (board.getFlipped(i, j)) {
-          int index = Coordinates.coordsToIndex(i, j, board.width);
+          int index = _coordsToIndex(i, j, board.width);
           matrix[index][bits] = true;
         }
       }
@@ -26,13 +23,12 @@ class BoardSolver {
     // the selected cell and the row represents the flipped cell.
     for (int iFlip = 0; iFlip < board.height; ++iFlip) {
       for (int jFlip = 0; jFlip < board.width; ++jFlip) {
-        int selectedIndex =
-            Coordinates.coordsToIndex(iFlip, jFlip, board.width);
-        for (int coordinate in board.getFlips(iFlip, jFlip)) {
-          int i = Coordinates.indexToICoord(coordinate, board.width);
-          int j = Coordinates.indexToJCoord(coordinate, board.width);
-          if (0 <= i && i < board.height && 0 <= j && j < board.width) {
-            matrix[coordinate][selectedIndex] = true;
+        int selectedIndex = _coordsToIndex(iFlip, jFlip, board.width);
+        for (Coordinate coord in board.getFlips(iFlip, jFlip)) {
+          if ((0 <= coord.i && coord.i < board.height) &&
+              (0 <= coord.j && coord.j < board.width)) {
+            int flippedIndex = _coordsToIndex(coord.i, coord.j, board.width);
+            matrix[flippedIndex][selectedIndex] = true;
           }
         }
       }
@@ -72,13 +68,17 @@ class BoardSolver {
       }
     }
 
-    final ans = List<Point<int>>();
+    final ans = List<Coordinate>();
     for (int i = 0; i < bits; ++i) {
       if (matrix[i][bits]) {
-        ans.add(Point(Coordinates.indexToJCoord(i, board.width),
-            Coordinates.indexToICoord(i, board.width)));
+        ans.add(Coordinate(
+            _indexToJCoord(i, board.width), _indexToICoord(i, board.width)));
       }
     }
     return ans;
   }
+
+  static int _coordsToIndex(int i, int j, int width) => i * width + j;
+  static int _indexToICoord(int index, int width) => index ~/ width;
+  static int _indexToJCoord(int index, int width) => index % width;
 }
