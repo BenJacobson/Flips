@@ -149,6 +149,13 @@ class _CellState extends State<_CellWidget> {
     }
     return GestureDetector(
       child: Container(
+        child: Container(
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+          margin: const EdgeInsets.all(19.0),
+        ),
         color: cellColor,
         height: 50,
         margin: const EdgeInsets.all(2.0),
@@ -158,3 +165,4 @@ class _CellState extends State<_CellWidget> {
     );
   }
 }
+
