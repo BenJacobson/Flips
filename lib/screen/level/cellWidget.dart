@@ -1,6 +1,8 @@
+import 'package:flips/model/board/cell.dart';
 import 'package:flips/main/theme.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';
+import 'package:flips/screen/level/shapeWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -78,12 +80,11 @@ class _CellState extends State<CellWidget> {
     }
     return GestureDetector(
       child: Container(
-        child: Container(
-          decoration: BoxDecoration(
-            color: boardBloc.getColor(i, j),
-            shape: BoxShape.circle,
+        child: Center(
+          child: shapeWidget(
+            boardBloc.getCellType(i, j),
+            boardBloc.getColor(i, j),
           ),
-          margin: const EdgeInsets.all(19.0),
         ),
         color: cellColor,
         height: 50,
@@ -92,5 +93,35 @@ class _CellState extends State<CellWidget> {
       ),
       onTap: () => boardBloc.eventSink.add(FlipEvent(i, j)),
     );
+  }
+
+  Shape shapeWidget(CellType cellType, Color color) {
+    double height = 15.0, width = 15.0;
+    if (cellType == CellType.BLUE) {
+      return SquareWidget(
+        color: color,
+        height: height-2,
+        width: width-2,
+      );
+    } else if (cellType == CellType.GREEN) {
+      return PlusWidget(
+        color: color,
+        height: height,
+        width: width,
+      );
+    } else if (cellType == CellType.RED) {
+      return XWidget(
+        color: color,
+        height: height,
+        width: width,
+      );
+    } else {
+      print('Error: shape not found for type.');
+      return SquareWidget(
+        color: color,
+        height: 0.0,
+        width: 0.0,
+      );
+    }
   }
 }

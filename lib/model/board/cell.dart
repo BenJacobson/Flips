@@ -1,13 +1,21 @@
 import 'package:flips/model/board/coordinate.dart';
 import 'package:flutter/material.dart';
 
+enum CellType {
+  BLUE,
+  GREEN,
+  RED,
+}
+
 abstract class Cell {
   final String serialized;
+  final CellType cellType;
   final Color color;
   bool flipped;
   bool selected;
 
   Cell({
+    @required this.cellType,
     @required this.color,
     this.flipped = false,
     this.selected = false,
@@ -20,6 +28,7 @@ abstract class Cell {
 class BlueCell extends Cell {
   BlueCell({flipped = false, selected = false})
       : super(
+          cellType: CellType.BLUE,
           color: Colors.lightBlue,
           flipped: flipped,
           selected: selected,
@@ -39,6 +48,7 @@ class BlueCell extends Cell {
 class GreenCell extends Cell {
   GreenCell({flipped = false, selected = false})
       : super(
+          cellType: CellType.GREEN,
           color: Colors.lightGreen,
           flipped: flipped,
           selected: selected,
@@ -58,6 +68,7 @@ class GreenCell extends Cell {
 class RedCell extends Cell {
   RedCell({flipped = false, selected = false})
       : super(
+          cellType: CellType.RED,
           color: Colors.red,
           flipped: flipped,
           selected: selected,

@@ -33,6 +33,8 @@ class Board implements ImmutableBoard {
 
   bool getSelected(int i, int j) => _board[i][j].selected;
 
+  CellType getCellType(int i, int j) => _board[i][j].cellType;
+
   flip(int iFlip, int jFlip) {
     _board[iFlip][jFlip].selected = !_board[iFlip][jFlip].selected;
     for (Coordinate coord in getFlips(iFlip, jFlip)) {

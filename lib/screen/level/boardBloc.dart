@@ -1,4 +1,5 @@
 import 'package:flips/model/board/board.dart';
+import 'package:flips/model/board/cell.dart';
 import 'package:flips/screen/level/events.dart';
 import 'package:flutter/material.dart';
 
@@ -31,6 +32,8 @@ class BoardBloc {
   }
 
   Color getColor(int i, int j) => _board.getColor(i, j);
+
+  CellType getCellType(int i, int j) => _board.getCellType(i, j);
 
   _transform(BoardEvent event) {
     if (event is FlipEvent) {
