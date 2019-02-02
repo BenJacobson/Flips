@@ -18,9 +18,15 @@ class Board implements ImmutableBoard {
   final int height;
   final int width;
 
+  final Set<CellType> cellTypes;
+
   List<List<Cell>> _board;
 
-  Board(this.height, this.width) {
+  Board({
+    @required this.height,
+    @required this.width,
+    @required this.cellTypes,
+  }) {
     reset();
   }
 
@@ -60,14 +66,6 @@ class Board implements ImmutableBoard {
     return _board.every((row) => row.every((cell) => !cell.flipped));
   }
 
-  Cell _newRandomCell() {
-    final val = _rng.nextDouble();
-    if (val < 0.2) {
-      return GreenCell();
-    } else if (val < 0.4) {
-      return RedCell();
-    } else {
-      return BlueCell();
-    }
-  }
+  Cell _newRandomCell() =>
+      Cell.fromCellType(cellTypes.elementAt(_rng.nextInt(cellTypes.length)));
 }

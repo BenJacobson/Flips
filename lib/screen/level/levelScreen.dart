@@ -1,12 +1,17 @@
-import 'package:flips/screen/level/boardWidget.dart';
 import 'package:flips/main/theme.dart';
 import 'package:flips/model/board/board.dart';
 import 'package:flips/screen/level/boardBloc.dart';
+import 'package:flips/screen/level/boardWidget.dart';
 import 'package:flips/screen/level/events.dart';
+import 'package:flips/screen/level/levelData.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class LevelScreen extends StatelessWidget {
+  final LevelData levelData;
+
+  LevelScreen(this.levelData);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,7 +20,7 @@ class LevelScreen extends StatelessWidget {
       ),
       backgroundColor: flipsTheme.backgroundColor,
       body: BoardBlocInheritedWidget(
-        boardBloc: BoardBloc(),
+        boardBloc: BoardBloc(levelData),
         child: _Level(),
       ),
     );

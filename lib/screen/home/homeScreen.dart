@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flips/screen/level/levelScreen.dart';
 import 'package:flips/main/theme.dart';
+import 'package:flips/model/board/cell.dart';
+import 'package:flips/screen/level/levelData.dart';
+import 'package:flips/screen/level/levelScreen.dart';
+import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -30,7 +32,13 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LevelScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => LevelScreen(LevelData(
+                            cellTypes: Set.of(
+                                [CellType.BLUE, CellType.GREEN, CellType.RED]),
+                            height: 4,
+                            width: 4,
+                          ))),
                 );
               },
               padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),

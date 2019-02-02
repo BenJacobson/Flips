@@ -8,6 +8,17 @@ enum CellType {
 }
 
 abstract class Cell {
+  static Cell fromCellType(CellType cellType) {
+    switch (cellType) {
+      case CellType.GREEN:
+        return GreenCell();
+      case CellType.RED:
+        return RedCell();
+      default:
+        return BlueCell();
+    }
+  }
+
   final String serialized;
   final CellType cellType;
   final Color color;
