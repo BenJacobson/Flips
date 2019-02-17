@@ -18,7 +18,7 @@ class LevelDataBloc {
   int _height = heightOptions.first;
   int _width = widthOptions.first;
 
-  final _levelDataStreamController = StreamController<LevelData>();
+  final _levelDataStreamController = StreamController<LevelData>.broadcast();
   Sink<LevelData> get _levelDataSink => _levelDataStreamController.sink;
   Stream<LevelData> get levelDataStream => _levelDataStreamController.stream;
 
@@ -54,6 +54,10 @@ class LevelDataBloc {
       width: _width,
     );
   }
+
+  bool usingCellType(CellType cellType) => _cellTypes.contains(cellType);
+
+  bool usingAnyCellType() => _cellTypes.length > 0;
 
   dispose() {
     _levelDataStreamController.close();

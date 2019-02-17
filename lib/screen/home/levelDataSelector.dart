@@ -1,4 +1,5 @@
 import 'package:flips/main/theme.dart';
+import 'package:flips/model/board/cell.dart';
 import 'package:flips/screen/home/levelDataBloc.dart';
 import 'package:flips/screen/home/events.dart';
 import 'package:flips/screen/level/levelData.dart';
@@ -7,6 +8,9 @@ import 'package:flutter/scheduler.dart';
 
 class LevelDataSelector extends StatelessWidget {
   final double fontSize = 32.0;
+  final double bigBlockSize = 80.0;
+  final double smallBlockSize = 20.0;
+  final Duration toggleDuration = const Duration(milliseconds: 200);
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +47,18 @@ class LevelDataSelector extends StatelessWidget {
                 ],
                 mainAxisAlignment: MainAxisAlignment.center,
               ),
+              SizedBox(
+                height: 30.0,
+              ),
+              Row(
+                children: LevelDataBloc.cellTypeOptions
+                    .map((cellType) => buildCellTypeSelector(
+                          levelDataBloc,
+                          cellType,
+                        ))
+                    .toList(),
+                mainAxisAlignment: MainAxisAlignment.center,
+              ),
             ],
           ),
         );
@@ -72,7 +88,7 @@ class LevelDataSelector extends StatelessWidget {
               return DropdownMenuItem<int>(
                 child: Container(
                   child: Text(item.toString()),
-                  margin: EdgeInsets.only(left: 16.0),
+                  margin: EdgeInsets.only(left: fontSize / 2),
                 ),
                 value: item,
               );
@@ -85,6 +101,44 @@ class LevelDataSelector extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget buildCellTypeSelector(LevelDataBloc levelDataBloc, CellType cellType) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+        child: Center(
+          child: StreamBuilder(
+              stream: levelDataBloc.levelDataStream,
+              builder:
+                  (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
+                return AnimatedContainer(
+                  color: Cell.fromCellType(cellType).color,
+                  duration: toggleDuration,
+                  height: levelDataBloc.usingCellType(cellType)
+                      ? bigBlockSize
+                      : smallBlockSize,
+                  width: levelDataBloc.usingCellType(cellType)
+                      ? bigBlockSize
+                      : smallBlockSize,
+                );
+              }),
+        ),
+        height: bigBlockSize,
+        margin: EdgeInsets.only(
+          left: smallBlockSize / 2,
+          right: smallBlockSize / 2,
+        ),
+        width: bigBlockSize,
+      ),
+      onTap: () {
+        if (levelDataBloc.usingCellType(cellType)) {
+          levelDataBloc.eventSink.add(RemoveCellTypeEvent(cellType));
+        } else {
+          levelDataBloc.eventSink.add(AddCellTypeEvent(cellType));
+        }
+      },
     );
   }
 }

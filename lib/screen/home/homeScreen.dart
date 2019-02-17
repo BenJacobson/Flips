@@ -24,10 +24,10 @@ class HomeScreen extends StatelessWidget {
 class _Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final levelDataBloc = LevelDataInheritedWidget.of(context).levelDataBloc;
     return Center(
       child: Column(
-        children: <Widget>[
-          SizedBox(height: 50),
+        children: [
           Text("Flips",
               style: TextStyle(
                 color: flipsTheme.accentColor,
@@ -35,27 +35,34 @@ class _Home extends StatelessWidget {
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.bold,
               )),
-          SizedBox(height: 100),
-          FlatButton(
-            child: Text("Play",
-                style:
-                    TextStyle(color: flipsTheme.accentColor, fontSize: 32.0)),
-            color: flipsTheme.primaryColor,
-            onPressed: () => gotoLevelScreen(context),
-            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-          ),
-          SizedBox(height: 100),
+          StreamBuilder(
+              stream: levelDataBloc.levelDataStream,
+              builder:
+                  (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
+                return FlatButton(
+                  child: Text("Play",
+                      style: TextStyle(
+                          color: flipsTheme.accentColor, fontSize: 32.0)),
+                  color: flipsTheme.primaryColor,
+                  disabledColor: flipsTheme.disabledColor,
+                  onPressed: levelDataBloc.usingAnyCellType()
+                      ? () =>
+                          gotoLevelScreen(context, levelDataBloc.getLevelData())
+                      : null,
+                  padding:
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0)),
+                );
+              }),
           LevelDataSelector(),
         ],
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       ),
     );
   }
 
-  gotoLevelScreen(BuildContext context) {
-    LevelData levelData =
-        LevelDataInheritedWidget.of(context).levelDataBloc.getLevelData();
+  gotoLevelScreen(BuildContext context, LevelData levelData) {
     Navigator.push(
       context,
       MaterialPageRoute(
