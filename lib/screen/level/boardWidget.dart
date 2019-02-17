@@ -5,9 +5,7 @@ import 'package:flutter/scheduler.dart';
 
 class BoardWidget extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return _BoardState();
-  }
+  State<StatefulWidget> createState() => _BoardState();
 }
 
 class _BoardState extends State<BoardWidget>

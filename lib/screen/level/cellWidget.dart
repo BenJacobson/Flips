@@ -14,21 +14,15 @@ class CellWidget extends StatefulWidget {
   CellWidget(this.i, this.j, {@required this.hintAnimation});
 
   @override
-  State<StatefulWidget> createState() {
-    return _CellState(i, j, hintAnimation: hintAnimation);
-  }
+  State<StatefulWidget> createState() => _CellState();
 }
 
 class _CellState extends State<CellWidget> {
-  final int i;
-  final int j;
-  final Animation<double> hintAnimation;
-
   bool _flipped = false;
   bool _selected = false;
   bool _showHint = false;
 
-  _CellState(this.i, this.j, {@required this.hintAnimation});
+  _CellState();
 
   @override
   void initState() {
@@ -37,8 +31,8 @@ class _CellState extends State<CellWidget> {
       BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
 
       boardBloc.boardStream.listen((board) {
-        bool newFlipped = board.getFlipped(i, j);
-        bool newSelected = board.getSelected(i, j);
+        bool newFlipped = board.getFlipped(widget.i, widget.j);
+        bool newSelected = board.getSelected(widget.i, widget.j);
 
         if (newFlipped != _flipped) {
           setState(() {
@@ -61,7 +55,7 @@ class _CellState extends State<CellWidget> {
         }
       });
 
-      hintAnimation.addListener(() {
+      widget.hintAnimation.addListener(() {
         if (_selected && _showHint) {
           setState(() {});
         }
@@ -72,18 +66,19 @@ class _CellState extends State<CellWidget> {
   @override
   Widget build(BuildContext context) {
     BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
-    Color cellColor =
-        _flipped ? flipsTheme.accentColor : boardBloc.getColor(i, j);
+    Color cellColor = _flipped
+        ? flipsTheme.accentColor
+        : boardBloc.getColor(widget.i, widget.j);
     if (_selected && _showHint) {
-      cellColor =
-          Color.lerp(cellColor, flipsTheme.hintColor, hintAnimation.value);
+      cellColor = Color.lerp(
+          cellColor, flipsTheme.hintColor, widget.hintAnimation.value);
     }
     return GestureDetector(
       child: Container(
         child: Center(
           child: shapeWidget(
-            boardBloc.getCellType(i, j),
-            boardBloc.getColor(i, j),
+            boardBloc.getCellType(widget.i, widget.j),
+            boardBloc.getColor(widget.i, widget.j),
           ),
         ),
         color: cellColor,
@@ -91,7 +86,7 @@ class _CellState extends State<CellWidget> {
         margin: const EdgeInsets.all(2.0),
         width: 50,
       ),
-      onTap: () => boardBloc.eventSink.add(FlipEvent(i, j)),
+      onTap: () => boardBloc.eventSink.add(FlipEvent(widget.i, widget.j)),
     );
   }
 
@@ -100,8 +95,8 @@ class _CellState extends State<CellWidget> {
     if (cellType == CellType.BLUE) {
       return SquareWidget(
         color: color,
-        height: height-2,
-        width: width-2,
+        height: height - 2,
+        width: width - 2,
       );
     } else if (cellType == CellType.GREEN) {
       return PlusWidget(
