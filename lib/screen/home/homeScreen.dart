@@ -46,8 +46,12 @@ class _Home extends StatelessWidget {
                   color: flipsTheme.primaryColor,
                   disabledColor: flipsTheme.disabledColor,
                   onPressed: levelDataBloc.usingAnyCellType()
-                      ? () =>
-                          gotoLevelScreen(context, levelDataBloc.getLevelData())
+                      ? () {
+                          if (levelDataBloc.usingAnyCellType()) {
+                            gotoLevelScreen(
+                                context, levelDataBloc.getLevelData());
+                          }
+                        }
                       : null,
                   padding:
                       EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
