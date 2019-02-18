@@ -11,7 +11,7 @@ class BoardWidget extends StatefulWidget {
 class _BoardState extends State<BoardWidget>
     with SingleTickerProviderStateMixin {
   AnimationController animationController;
-  Animation animation;
+  Animation<double> animation;
 
   @override
   void initState() {

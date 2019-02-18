@@ -4,6 +4,6 @@ final flipsTheme = ThemeData(
   accentColor: Colors.white,
   backgroundColor: Color.fromRGBO(0, 0, 50, 1.0),
   disabledColor: Color.fromRGBO(150, 150, 150, 1.0),
-  hintColor: Color(0xFFF9D77E),
+  hintColor: Color.fromRGBO(249, 215, 126, 1.0),
   primaryColor: Colors.blue,
 );

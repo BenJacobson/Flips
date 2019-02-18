@@ -3,6 +3,7 @@ import 'package:flips/main/theme.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';
 import 'package:flips/screen/level/shapeWidgets.dart';
+import 'package:flips/widget/flipWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -66,25 +67,28 @@ class _CellState extends State<CellWidget> {
   @override
   Widget build(BuildContext context) {
     BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
-    Color cellColor = _flipped
-        ? flipsTheme.accentColor
-        : boardBloc.getColor(widget.i, widget.j);
-    if (_selected && _showHint) {
-      cellColor = Color.lerp(
-          cellColor, flipsTheme.hintColor, widget.hintAnimation.value);
-    }
     return GestureDetector(
-      child: Container(
-        child: Center(
-          child: shapeWidget(
-            boardBloc.getCellType(widget.i, widget.j),
-            boardBloc.getColor(widget.i, widget.j),
-          ),
+      child: FlipWidget(
+        child1: Container(
+          color: lerpHintColor(boardBloc.getColor(widget.i, widget.j)),
+          height: 50,
+          margin: const EdgeInsets.all(2.0),
+          width: 50,
         ),
-        color: cellColor,
-        height: 50,
-        margin: const EdgeInsets.all(2.0),
-        width: 50,
+        child2: Container(
+          child: Center(
+            child: shapeWidget(
+              boardBloc.getCellType(widget.i, widget.j),
+              boardBloc.getColor(widget.i, widget.j),
+            ),
+          ),
+          color: lerpHintColor(flipsTheme.accentColor),
+          height: 50,
+          margin: const EdgeInsets.all(2.0),
+          width: 50,
+        ),
+        origin: Offset(27.0, 27.0),
+        flipped: _flipped,
       ),
       onTap: () => boardBloc.eventSink.add(FlipEvent(widget.i, widget.j)),
     );
@@ -118,5 +122,13 @@ class _CellState extends State<CellWidget> {
         width: 0.0,
       );
     }
+  }
+
+  Color lerpHintColor(Color color) {
+    if (_selected && _showHint) {
+      return Color.lerp(
+          color, flipsTheme.hintColor, widget.hintAnimation.value);
+    }
+    return color;
   }
 }
