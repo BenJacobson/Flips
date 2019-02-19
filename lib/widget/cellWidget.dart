@@ -1,4 +1,3 @@
-import 'package:flips/model/board/cell.dart';
 import 'package:flips/main/theme.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';
@@ -11,8 +10,14 @@ class CellWidget extends StatefulWidget {
   final int i;
   final int j;
   final Animation<double> hintAnimation;
+  final double size;
 
-  CellWidget(this.i, this.j, {@required this.hintAnimation});
+  CellWidget(
+    this.i,
+    this.j, {
+    @required this.hintAnimation,
+    @required this.size,
+  });
 
   @override
   State<StatefulWidget> createState() => _CellState();
@@ -71,57 +76,23 @@ class _CellState extends State<CellWidget> {
       child: FlipWidget(
         child1: Container(
           color: lerpHintColor(boardBloc.getColor(widget.i, widget.j)),
-          height: 50,
-          margin: const EdgeInsets.all(2.0),
-          width: 50,
+          height: widget.size,
+          width: widget.size,
         ),
         child2: Container(
           child: Center(
-            child: shapeWidget(
-              boardBloc.getCellType(widget.i, widget.j),
-              boardBloc.getColor(widget.i, widget.j),
-            ),
+            child: Shape.fromCellType(
+                boardBloc.getCellType(widget.i, widget.j), widget.size * 0.3),
           ),
           color: lerpHintColor(flipsTheme.accentColor),
-          height: 50,
-          margin: const EdgeInsets.all(2.0),
-          width: 50,
+          height: widget.size,
+          width: widget.size,
         ),
-        origin: Offset(27.0, 27.0),
+        origin: Offset(widget.size / 2, widget.size / 2),
         flipped: _flipped,
       ),
       onTap: () => boardBloc.eventSink.add(FlipEvent(widget.i, widget.j)),
     );
-  }
-
-  Shape shapeWidget(CellType cellType, Color color) {
-    double height = 15.0, width = 15.0;
-    if (cellType == CellType.BLUE) {
-      return SquareWidget(
-        color: color,
-        height: height - 2,
-        width: width - 2,
-      );
-    } else if (cellType == CellType.GREEN) {
-      return PlusWidget(
-        color: color,
-        height: height,
-        width: width,
-      );
-    } else if (cellType == CellType.RED) {
-      return XWidget(
-        color: color,
-        height: height,
-        width: width,
-      );
-    } else {
-      print('Error: shape not found for type.');
-      return SquareWidget(
-        color: color,
-        height: 0.0,
-        width: 0.0,
-      );
-    }
   }
 
   Color lerpHintColor(Color color) {

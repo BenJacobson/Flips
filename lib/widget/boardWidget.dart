@@ -49,10 +49,13 @@ class _BoardState extends State<BoardWidget>
   Widget build(BuildContext context) {
     BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
     return Column(
-      children: List<Row>.generate(boardBloc.height, (i) {
+      children: List.generate(boardBloc.height, (i) {
         return Row(
-          children: List<CellWidget>.generate(boardBloc.width, (j) {
-            return CellWidget(i, j, hintAnimation: animation);
+          children: List.generate(boardBloc.width, (j) {
+            return Container(
+              child: CellWidget(i, j, hintAnimation: animation, size: 50.0),
+              margin: EdgeInsets.all(2.0),
+            );
           }),
           mainAxisAlignment: MainAxisAlignment.center,
         );

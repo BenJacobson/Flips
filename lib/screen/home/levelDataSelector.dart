@@ -3,13 +3,16 @@ import 'package:flips/model/board/cell.dart';
 import 'package:flips/model/level/levelData.dart';
 import 'package:flips/screen/home/levelDataBloc.dart';
 import 'package:flips/screen/home/events.dart';
+import 'package:flips/widget/flipWidget.dart';
+import 'package:flips/widget/shapeWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class LevelDataSelector extends StatelessWidget {
-  final double fontSize = 32.0;
-  final double bigBlockSize = 80.0;
-  final double smallBlockSize = 20.0;
+  static final double _baseSize = 80.0;
+  static final double _iconSize = _baseSize * 0.3;
+  static final double _fontSize = _baseSize * 0.4;
+  static final double _spacingSize = _baseSize * 0.3;
   final Duration toggleDuration = const Duration(milliseconds: 200);
 
   @override
@@ -18,51 +21,61 @@ class LevelDataSelector extends StatelessWidget {
         LevelDataInheritedWidget.of(context).levelDataBloc;
     SchedulerBinding.instance.scheduleFrameCallback(
         (timestamp) => levelDataBloc.eventSink.add(PushEvent()));
-    return StreamBuilder(
-      stream: levelDataBloc.levelDataStream,
-      builder: (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
-        if (!snapshot.hasData) {
-          return Container();
-        }
-        return DropdownButtonHideUnderline(
-          child: Column(
+    return DropdownButtonHideUnderline(
+      child: Column(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  buildNumberSelector(
+              StreamBuilder(
+                stream: levelDataBloc.levelDataStream,
+                builder:
+                    (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
+                  int width = snapshot.hasData
+                      ? snapshot.data.width
+                      : LevelDataBloc.widthOptions.first;
+                  return buildNumberSelector(
                       context,
                       "Width",
-                      snapshot.data.width,
+                      width,
                       (selectedWidth) => levelDataBloc.eventSink
-                          .add(WidthEvent(selectedWidth))),
-                  SizedBox(
-                    width: fontSize,
-                  ),
-                  buildNumberSelector(
-                      context,
-                      "Height",
-                      snapshot.data.height,
-                      (selectedHeight) => levelDataBloc.eventSink
-                          .add(HeightEvent(selectedHeight))),
-                ],
-                mainAxisAlignment: MainAxisAlignment.center,
+                          .add(WidthEvent(selectedWidth)));
+                },
               ),
               SizedBox(
-                height: 30.0,
+                width: _spacingSize,
               ),
-              Row(
-                children: LevelDataBloc.cellTypeOptions
-                    .map((cellType) => buildCellTypeSelector(
-                          levelDataBloc,
-                          cellType,
-                        ))
-                    .toList(),
-                mainAxisAlignment: MainAxisAlignment.center,
+              StreamBuilder(
+                stream: levelDataBloc.levelDataStream,
+                builder:
+                    (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
+                  int height = snapshot.hasData
+                      ? snapshot.data.height
+                      : LevelDataBloc.heightOptions.first;
+                  return buildNumberSelector(
+                      context,
+                      "Height",
+                      height,
+                      (selectedHeight) => levelDataBloc.eventSink
+                          .add(HeightEvent(selectedHeight)));
+                },
               ),
             ],
+            mainAxisAlignment: MainAxisAlignment.center,
           ),
-        );
-      },
+          SizedBox(
+            height: _spacingSize,
+          ),
+          Row(
+            children: LevelDataBloc.cellTypeOptions
+                .map((cellType) => buildCellTypeSelector(
+                      levelDataBloc,
+                      cellType,
+                    ))
+                .toList(),
+            mainAxisAlignment: MainAxisAlignment.center,
+          ),
+        ],
+      ),
     );
   }
 
@@ -74,28 +87,28 @@ class LevelDataSelector extends StatelessWidget {
           label,
           style: flipsTheme.textTheme.subhead.copyWith(
             color: flipsTheme.accentColor,
-            fontSize: fontSize,
+            fontSize: _fontSize,
           ),
         ),
         SizedBox(
-          height: fontSize / 2,
+          height: _spacingSize / 2,
         ),
         Container(
           color: flipsTheme.accentColor,
           child: DropdownButton<int>(
-            iconSize: fontSize,
+            iconSize: _fontSize,
             items: LevelDataBloc.heightOptions.map((item) {
               return DropdownMenuItem<int>(
                 child: Container(
                   child: Text(item.toString()),
-                  margin: EdgeInsets.only(left: fontSize / 2),
+                  margin: EdgeInsets.only(left: _spacingSize),
                 ),
                 value: item,
               );
             }).toList(),
             onChanged: onChanged,
             style: flipsTheme.textTheme.subhead.copyWith(
-              fontSize: fontSize,
+              fontSize: _fontSize,
             ),
             value: value,
           ),
@@ -113,24 +126,31 @@ class LevelDataSelector extends StatelessWidget {
               stream: levelDataBloc.levelDataStream,
               builder:
                   (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
-                return AnimatedContainer(
-                  color: Cell.fromCellType(cellType).color,
-                  duration: toggleDuration,
-                  height: levelDataBloc.usingCellType(cellType)
-                      ? bigBlockSize
-                      : smallBlockSize,
-                  width: levelDataBloc.usingCellType(cellType)
-                      ? bigBlockSize
-                      : smallBlockSize,
+                return FlipWidget(
+                  child1: Container(
+                    color: Cell.colorForType(cellType),
+                    height: _baseSize,
+                    width: _baseSize,
+                  ),
+                  child2: Container(
+                    child: Center(
+                      child: Shape.fromCellType(cellType, _iconSize),
+                    ),
+                    color: flipsTheme.disabledColor,
+                    height: _baseSize,
+                    width: _baseSize,
+                  ),
+                  origin: Offset(_baseSize / 2, _baseSize / 2),
+                  flipped: !levelDataBloc.usingCellType(cellType),
                 );
               }),
         ),
-        height: bigBlockSize,
+        height: _baseSize,
         margin: EdgeInsets.only(
-          left: smallBlockSize / 2,
-          right: smallBlockSize / 2,
+          left: _spacingSize / 2,
+          right: _spacingSize / 2,
         ),
-        width: bigBlockSize,
+        width: _baseSize,
       ),
       onTap: () {
         if (levelDataBloc.usingCellType(cellType)) {

@@ -19,6 +19,17 @@ abstract class Cell {
     }
   }
 
+  static Color colorForType(CellType cellType) {
+    switch (cellType) {
+      case CellType.GREEN:
+        return GreenCell.instance.color;
+      case CellType.RED:
+        return RedCell.instance.color;
+      default:
+        return BlueCell.instance.color;
+    }
+  }
+
   final String serialized;
   final CellType cellType;
   final Color color;
@@ -37,6 +48,8 @@ abstract class Cell {
 }
 
 class BlueCell extends Cell {
+  static final instance = BlueCell();
+
   BlueCell({flipped = false, selected = false})
       : super(
           cellType: CellType.BLUE,
@@ -57,6 +70,8 @@ class BlueCell extends Cell {
 }
 
 class GreenCell extends Cell {
+  static final instance = GreenCell();
+
   GreenCell({flipped = false, selected = false})
       : super(
           cellType: CellType.GREEN,
@@ -77,6 +92,8 @@ class GreenCell extends Cell {
 }
 
 class RedCell extends Cell {
+  static final instance = RedCell();
+
   RedCell({flipped = false, selected = false})
       : super(
           cellType: CellType.RED,

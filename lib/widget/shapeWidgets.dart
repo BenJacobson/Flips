@@ -1,8 +1,40 @@
+import 'package:flips/model/board/cell.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:math';
 
 abstract class Shape extends StatelessWidget {
+
+  static Shape fromCellType(CellType cellType, double size) {
+    Color color = Cell.colorForType(cellType);
+    if (cellType == CellType.BLUE) {
+      return SquareWidget(
+        color: color,
+        height: size - 2,
+        width: size - 2,
+      );
+    } else if (cellType == CellType.GREEN) {
+      return PlusWidget(
+        color: color,
+        height: size,
+        width: size,
+      );
+    } else if (cellType == CellType.RED) {
+      return XWidget(
+        color: color,
+        height: size,
+        width: size,
+      );
+    } else {
+      print('Error: shape not found for type.');
+      return SquareWidget(
+        color: color,
+        height: 0.0,
+        width: 0.0,
+      );
+    }
+  }
+
   final Color color;
   final double height;
   final double width;
