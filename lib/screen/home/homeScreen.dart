@@ -1,7 +1,7 @@
 import 'package:flips/main/theme.dart';
+import 'package:flips/model/level/levelData.dart';
 import 'package:flips/screen/home/levelDataBloc.dart';
 import 'package:flips/screen/home/levelDataSelector.dart';
-import 'package:flips/screen/level/levelData.dart';
 import 'package:flips/screen/level/levelScreen.dart';
 import 'package:flutter/material.dart';
 

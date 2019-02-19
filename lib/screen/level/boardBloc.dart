@@ -1,7 +1,7 @@
 import 'package:flips/model/board/board.dart';
 import 'package:flips/model/board/cell.dart';
+import 'package:flips/model/level/levelData.dart';
 import 'package:flips/screen/level/events.dart';
-import 'package:flips/screen/level/levelData.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:async';

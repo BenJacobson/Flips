@@ -1,8 +1,8 @@
 import 'package:flips/main/theme.dart';
 import 'package:flips/model/board/cell.dart';
+import 'package:flips/model/level/levelData.dart';
 import 'package:flips/screen/home/levelDataBloc.dart';
 import 'package:flips/screen/home/events.dart';
-import 'package:flips/screen/level/levelData.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
