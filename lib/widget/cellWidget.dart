@@ -1,4 +1,4 @@
-import 'package:flips/main/theme.dart';
+import 'package:flips/global/theme.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';
 import 'package:flips/widget/flipWidget.dart';

@@ -7,6 +7,9 @@ enum CellType {
   RED,
 }
 
+final cellTypeStringMap = Map<String, CellType>.fromEntries(
+    CellType.values.map((cellType) => MapEntry(cellType.toString(), cellType)));
+
 abstract class Cell {
   static Cell fromCellType(CellType cellType) {
     switch (cellType) {

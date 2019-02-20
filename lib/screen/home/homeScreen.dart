@@ -1,4 +1,4 @@
-import 'package:flips/main/theme.dart';
+import 'package:flips/global/theme.dart';
 import 'package:flips/model/level/levelData.dart';
 import 'package:flips/screen/home/levelDataBloc.dart';
 import 'package:flips/screen/home/levelDataSelector.dart';

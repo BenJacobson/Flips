@@ -1,3 +1,4 @@
+import 'package:flips/global/preferences.dart';
 import 'package:flips/model/board/cell.dart';
 import 'package:flips/model/level/levelData.dart';
 import 'package:flips/screen/home/events.dart';
@@ -28,17 +29,38 @@ class LevelDataBloc {
 
   LevelDataBloc() {
     _eventStream.listen(_transform);
+    _loadPreferences();
+  }
+
+  _loadPreferences() async {
+    final cellTypes = await Preferences.freePlayBoardCells;
+    final height = await Preferences.freePlayBoardHeight;
+    final width = await Preferences.freePlayBoardWidth;
+    if (cellTypes != null) {
+      _cellTypes = cellTypes;
+    }
+    if (height != null) {
+      _height = height;
+    }
+    if (width != null) {
+      _width = width;
+    }
+    eventSink.add(PushEvent());
   }
 
   _transform(LevelDataEvent event) {
     if (event is AddCellTypeEvent) {
       _cellTypes.add(event.cellType);
+      Preferences.freePlayBoardCells = _cellTypes;
     } else if (event is RemoveCellTypeEvent) {
       _cellTypes.remove(event.cellType);
+      Preferences.freePlayBoardCells = _cellTypes;
     } else if (event is HeightEvent) {
       _height = event.height;
+      Preferences.freePlayBoardHeight = _height;
     } else if (event is WidthEvent) {
       _width = event.width;
+      Preferences.freePlayBoardWidth = _width;
     } else if (event is PushEvent) {
       // Let the data flow.
     } else {
