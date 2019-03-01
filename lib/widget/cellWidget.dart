@@ -1,4 +1,5 @@
 import 'package:flips/global/theme.dart';
+import 'package:flips/model/board/cell.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';
 import 'package:flips/widget/flipWidget.dart';
@@ -24,6 +25,7 @@ class CellWidget extends StatefulWidget {
 }
 
 class _CellState extends State<CellWidget> {
+  CellType _cellType;
   bool _flipped = false;
   bool _selected = false;
   bool _showHint = false;
@@ -37,8 +39,15 @@ class _CellState extends State<CellWidget> {
       BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
 
       boardBloc.boardStream.listen((board) {
+        CellType newCellType = boardBloc.getCellType(widget.i, widget.j);
         bool newFlipped = board.getFlipped(widget.i, widget.j);
         bool newSelected = board.getSelected(widget.i, widget.j);
+
+        if (newCellType != _cellType) {
+          setState(() {
+            _cellType = newCellType;
+          });
+        }
 
         if (newFlipped != _flipped) {
           setState(() {
