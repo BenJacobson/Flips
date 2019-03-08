@@ -78,6 +78,7 @@ class _CompletedDialog extends StatelessWidget {
             Navigator.of(context).pop(); // Pop the dialog.
             Navigator.of(context).pop(); // Pop the level screen.
           },
+          textColor: Colors.black,
         ),
         FlatButton(
           child: Text('Yes'),
@@ -85,6 +86,7 @@ class _CompletedDialog extends StatelessWidget {
             Navigator.of(context).pop(); // Pop the dialog.
             boardBloc.eventSink.add(ResetEvent());
           },
+          textColor: Colors.black,
         ),
       ],
       content: Text("Play Again?"),
