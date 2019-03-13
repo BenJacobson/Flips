@@ -1,8 +1,5 @@
 import 'package:flips/global/theme.dart';
-import 'package:flips/model/level/levelData.dart';
-import 'package:flips/screen/home/levelDataBloc.dart';
-import 'package:flips/screen/home/levelDataSelector.dart';
-import 'package:flips/screen/level/levelScreen.dart';
+import 'package:flips/screen/freeplay/freePlayScreen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -13,10 +10,7 @@ class HomeScreen extends StatelessWidget {
         title: Text("Flips"),
       ),
       backgroundColor: flipsTheme.backgroundColor,
-      body: LevelDataInheritedWidget(
-        levelDataBloc: LevelDataBloc(),
-        child: _Home(),
-      ),
+      body: _Home(),
     );
   }
 }
@@ -24,7 +18,6 @@ class HomeScreen extends StatelessWidget {
 class _Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final levelDataBloc = LevelDataInheritedWidget.of(context).levelDataBloc;
     return Center(
       child: Column(
         children: [
@@ -35,46 +28,27 @@ class _Home extends StatelessWidget {
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.bold,
               )),
-          StreamBuilder(
-              stream: levelDataBloc.levelDataStream,
-              builder:
-                  (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
-                return FlatButton(
-                  child: Text("Play",
-                      style: TextStyle(
-                          color: flipsTheme.accentColor, fontSize: 32.0)),
-                  color: flipsTheme.primaryColor,
-                  disabledColor: flipsTheme.disabledColor,
-                  onPressed: levelDataBloc.usingAnyCellType()
-                      ? () {
-                          if (levelDataBloc.usingAnyCellType()) {
-                            gotoLevelScreen(
-                                context, levelDataBloc.getLevelData());
-                          }
-                        }
-                      : null,
-                  padding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0)),
-                );
-              }),
-          LevelDataSelector(),
+          FlatButton(
+            child: Text("Free Play",
+                style:
+                    TextStyle(color: flipsTheme.accentColor, fontSize: 32.0)),
+            color: flipsTheme.primaryColor,
+            disabledColor: flipsTheme.disabledColor,
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => FreePlayScreen())
+              );
+            },
+            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+          ),
         ],
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       ),
     );
   }
 
-  gotoLevelScreen(BuildContext context, LevelData levelData) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => LevelScreen(LevelData(
-                cellTypes: levelData.cellTypes,
-                height: levelData.height,
-                width: levelData.width,
-              ))),
-    );
-  }
 }

@@ -1,10 +1,10 @@
 import 'package:flips/global/theme.dart';
 import 'package:flips/model/board/cell.dart';
 import 'package:flips/model/level/levelData.dart';
-import 'package:flips/screen/home/levelDataBloc.dart';
+import 'package:flips/widget/leveldata/levelDataBloc.dart';
 import 'package:flips/screen/home/events.dart';
-import 'package:flips/widget/flipWidget.dart';
-import 'package:flips/widget/shapeWidgets.dart';
+import 'package:flips/widget/animation/flipWidget.dart';
+import 'package:flips/widget/board/shapeWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 

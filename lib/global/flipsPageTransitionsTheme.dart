@@ -9,9 +9,20 @@ class FlipsPageTransitionsTheme extends PageTransitionsTheme {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return FadeTransition(
-      opacity: animation,
-      child: child,
+    final offsetAnimation = Tween<Offset>(
+      begin: Offset(1.0, 0.0),
+      end: Offset(0.0, 0.0),
+    ).animate(animation);
+    final secondaryOffsetAnimation = Tween<Offset>(
+      begin: Offset(0.0, 0.0),
+      end: Offset(-1.0, 0.0),
+    ).animate(secondaryAnimation);
+    return SlideTransition(
+      child: SlideTransition(
+        child: child,
+        position: offsetAnimation,
+      ),
+      position: secondaryOffsetAnimation,
     );
   }
 }

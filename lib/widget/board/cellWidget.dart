@@ -2,8 +2,8 @@ import 'package:flips/global/theme.dart';
 import 'package:flips/model/board/cell.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';
-import 'package:flips/widget/flipWidget.dart';
-import 'package:flips/widget/shapeWidgets.dart';
+import 'package:flips/widget/animation/flipWidget.dart';
+import 'package:flips/widget/board/shapeWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 

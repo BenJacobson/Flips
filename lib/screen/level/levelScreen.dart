@@ -3,7 +3,7 @@ import 'package:flips/model/board/board.dart';
 import 'package:flips/model/level/levelData.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';
-import 'package:flips/widget/boardWidget.dart';
+import 'package:flips/widget/board/boardWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 

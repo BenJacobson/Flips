@@ -1,5 +1,5 @@
 import 'package:flips/screen/level/boardBloc.dart';
-import 'package:flips/widget/cellWidget.dart';
+import 'package:flips/widget/board/cellWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
