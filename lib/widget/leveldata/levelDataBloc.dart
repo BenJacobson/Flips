@@ -20,11 +20,15 @@ class LevelDataBloc {
   int _width = widthOptions.first;
 
   final _levelDataStreamController = StreamController<LevelData>.broadcast();
+
   Sink<LevelData> get _levelDataSink => _levelDataStreamController.sink;
+
   Stream<LevelData> get levelDataStream => _levelDataStreamController.stream;
 
   final _eventStreamController = StreamController<LevelDataEvent>();
+
   Sink<LevelDataEvent> get eventSink => _eventStreamController.sink;
+
   Stream<LevelDataEvent> get _eventStream => _eventStreamController.stream;
 
   LevelDataBloc() {

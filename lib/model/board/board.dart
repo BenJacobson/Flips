@@ -6,7 +6,9 @@ import 'dart:math';
 
 abstract class ImmutableBoard {
   bool getFlipped(int i, int j);
+
   bool getSelected(int i, int j);
+
   bool isCompleted();
 }
 

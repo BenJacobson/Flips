@@ -85,16 +85,16 @@ class LevelDataSelector extends StatelessWidget {
       children: [
         Text(
           label,
-          style: flipsTheme.textTheme.subhead.copyWith(
-            color: flipsTheme.accentColor,
-            fontSize: _fontSize,
-          ),
+          style: Theme.of(context).textTheme.subhead.copyWith(
+                color: Theme.of(context).accentColor,
+                fontSize: _fontSize,
+              ),
         ),
         SizedBox(
           height: _spacingSize / 2,
         ),
         Container(
-          color: flipsTheme.accentColor,
+          color: Theme.of(context).accentColor,
           child: DropdownButton<int>(
             iconSize: _fontSize,
             items: LevelDataBloc.heightOptions.map((item) {
@@ -107,9 +107,9 @@ class LevelDataSelector extends StatelessWidget {
               );
             }).toList(),
             onChanged: onChanged,
-            style: flipsTheme.textTheme.subhead.copyWith(
-              fontSize: _fontSize,
-            ),
+            style: Theme.of(context).textTheme.subhead.copyWith(
+                  fontSize: _fontSize,
+                ),
             value: value,
           ),
         ),
@@ -136,7 +136,7 @@ class LevelDataSelector extends StatelessWidget {
                     child: Center(
                       child: Shape.fromCellType(cellType, _iconSize),
                     ),
-                    color: flipsTheme.disabledColor,
+                    color: Theme.of(context).disabledColor,
                     height: _baseSize,
                     width: _baseSize,
                   ),

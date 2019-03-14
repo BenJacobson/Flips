@@ -93,7 +93,7 @@ class _CellState extends State<CellWidget> {
             child: Shape.fromCellType(
                 boardBloc.getCellType(widget.i, widget.j), widget.size * 0.3),
           ),
-          color: lerpHintColor(flipsTheme.accentColor),
+          color: lerpHintColor(Theme.of(context).accentColor),
           height: widget.size,
           width: widget.size,
         ),
@@ -107,7 +107,7 @@ class _CellState extends State<CellWidget> {
   Color lerpHintColor(Color color) {
     if (_selected && _showHint) {
       return Color.lerp(
-          color, flipsTheme.hintColor, widget.hintAnimation.value);
+          color, Theme.of(context).hintColor, widget.hintAnimation.value);
     }
     return color;
   }

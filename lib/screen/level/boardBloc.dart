@@ -8,24 +8,32 @@ import 'dart:async';
 
 class BoardBloc {
   final Board _board;
+
   int get width => _board.width;
+
   int get height => _board.height;
 
   bool _showHints = false;
 
   final _boardEventController = StreamController<BoardEvent>();
+
   StreamSink<BoardEvent> get eventSink => _boardEventController.sink;
+
   Stream<BoardEvent> get _eventStream => _boardEventController.stream;
 
   final _immutableBoardStreamController =
       StreamController<ImmutableBoard>.broadcast();
+
   StreamSink<ImmutableBoard> get _boardSink =>
       _immutableBoardStreamController.sink;
+
   Stream<ImmutableBoard> get boardStream =>
       _immutableBoardStreamController.stream;
 
   final _showHintsStreamController = StreamController<bool>.broadcast();
+
   StreamSink<bool> get _showHintsSink => _showHintsStreamController.sink;
+
   Stream<bool> get showHintsStream => _showHintsStreamController.stream;
 
   BoardBloc(LevelData levelData)

@@ -18,7 +18,7 @@ class LevelScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text("Free Play"),
       ),
-      backgroundColor: flipsTheme.backgroundColor,
+      backgroundColor: Theme.of(context).backgroundColor,
       body: BoardBlocInheritedWidget(
         boardBloc: BoardBloc(levelData),
         child: _Level(),
@@ -114,8 +114,8 @@ class _ShowHintsWidget extends StatelessWidget {
                   value: snapshot.data,
                 ),
                 Text("Show hints",
-                    style:
-                        TextStyle(color: flipsTheme.accentColor, fontSize: 24)),
+                    style: TextStyle(
+                        color: Theme.of(context).accentColor, fontSize: 24)),
               ],
               mainAxisAlignment: MainAxisAlignment.center,
             ),

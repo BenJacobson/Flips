@@ -9,7 +9,7 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text("Flips"),
       ),
-      backgroundColor: flipsTheme.backgroundColor,
+      backgroundColor: Theme.of(context).backgroundColor,
       body: _Home(),
     );
   }
@@ -23,23 +23,20 @@ class _Home extends StatelessWidget {
         children: [
           Text("Flips",
               style: TextStyle(
-                color: flipsTheme.accentColor,
+                color: Theme.of(context).accentColor,
                 fontSize: 128.0,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.bold,
               )),
           FlatButton(
             child: Text("Free Play",
-                style:
-                    TextStyle(color: flipsTheme.accentColor, fontSize: 32.0)),
-            color: flipsTheme.primaryColor,
-            disabledColor: flipsTheme.disabledColor,
+                style: TextStyle(
+                    color: Theme.of(context).accentColor, fontSize: 32.0)),
+            color: Theme.of(context).primaryColor,
+            disabledColor: Theme.of(context).disabledColor,
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => FreePlayScreen())
-              );
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => FreePlayScreen()));
             },
             padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
             shape: RoundedRectangleBorder(
@@ -50,5 +47,4 @@ class _Home extends StatelessWidget {
       ),
     );
   }
-
 }

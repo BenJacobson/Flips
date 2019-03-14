@@ -22,10 +22,12 @@ class Preferences {
 
   static Future<int> get freePlayBoardHeight =>
       _getInt(_FREE_PLAY_BOARD_HEIGHT);
+
   static set freePlayBoardHeight(int value) =>
       _setInt(_FREE_PLAY_BOARD_HEIGHT, value);
 
   static Future<int> get freePlayBoardWidth => _getInt(_FREE_PLAY_BOARD_WIDTH);
+
   static set freePlayBoardWidth(int value) =>
       _setInt(_FREE_PLAY_BOARD_WIDTH, value);
 

@@ -79,6 +79,8 @@ class BoardSolver {
   }
 
   static int _coordsToIndex(int i, int j, int width) => i * width + j;
+
   static int _indexToICoord(int index, int width) => index ~/ width;
+
   static int _indexToJCoord(int index, int width) => index % width;
 }

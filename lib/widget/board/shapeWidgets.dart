@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 abstract class Shape extends StatelessWidget {
-
   static Shape fromCellType(CellType cellType, double size) {
     Color color = Cell.colorForType(cellType);
     if (cellType == CellType.BLUE) {
