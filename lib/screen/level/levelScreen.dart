@@ -1,6 +1,5 @@
-import 'package:flips/global/theme.dart';
 import 'package:flips/model/board/board.dart';
-import 'package:flips/model/level/levelData.dart';
+import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';
 import 'package:flips/widget/board/boardWidget.dart';
@@ -10,7 +9,7 @@ import 'package:flutter/scheduler.dart';
 class LevelScreen extends StatelessWidget {
   final LevelData levelData;
 
-  LevelScreen(this.levelData);
+  LevelScreen({this.levelData});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +75,7 @@ class _CompletedDialog extends StatelessWidget {
           child: Text('No'),
           onPressed: () {
             Navigator.of(context).pop(); // Pop the dialog.
-            Navigator.of(context).pop(); // Pop the level screen.
+            Navigator.of(context).pop(false); // Pop the level screen.
           },
           textColor: Colors.black,
         ),
@@ -84,7 +83,7 @@ class _CompletedDialog extends StatelessWidget {
           child: Text('Yes'),
           onPressed: () {
             Navigator.of(context).pop(); // Pop the dialog.
-            boardBloc.eventSink.add(ResetEvent());
+            Navigator.of(context).pop(true); // Pop the level screen.
           },
           textColor: Colors.black,
         ),

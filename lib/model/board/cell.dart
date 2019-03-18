@@ -11,6 +11,20 @@ final cellTypeStringMap = Map<String, CellType>.fromEntries(
     CellType.values.map((cellType) => MapEntry(cellType.toString(), cellType)));
 
 abstract class Cell {
+  static CellType deserializeCellType(String c) {
+    assert(c.length == 1);
+    switch (c.toUpperCase()) {
+      case BlueCell.serialized:
+        return CellType.BLUE;
+      case GreenCell.serialized:
+        return CellType.GREEN;
+      case RedCell.serialized:
+        return CellType.RED;
+    }
+    assert(false, "Failed to deserialize cell type: " + c);
+    return CellType.BLUE;
+  }
+
   static Cell fromCellType(CellType cellType) {
     switch (cellType) {
       case CellType.GREEN:
@@ -33,7 +47,6 @@ abstract class Cell {
     }
   }
 
-  final String serialized;
   final CellType cellType;
   final Color color;
   bool flipped;
@@ -44,7 +57,6 @@ abstract class Cell {
     @required this.color,
     this.flipped = false,
     this.selected = false,
-    @required this.serialized,
   });
 
   Iterable<Coordinate> flips(int i, int j, int width, int height);
@@ -52,6 +64,7 @@ abstract class Cell {
 
 class BlueCell extends Cell {
   static final instance = BlueCell();
+  static const String serialized = 'B';
 
   BlueCell({flipped = false, selected = false})
       : super(
@@ -59,7 +72,6 @@ class BlueCell extends Cell {
           color: Colors.lightBlue,
           flipped: flipped,
           selected: selected,
-          serialized: 'B',
         );
 
   Iterable<Coordinate> flips(
@@ -74,6 +86,7 @@ class BlueCell extends Cell {
 
 class GreenCell extends Cell {
   static final instance = GreenCell();
+  static const String serialized = 'G';
 
   GreenCell({flipped = false, selected = false})
       : super(
@@ -81,7 +94,6 @@ class GreenCell extends Cell {
           color: Colors.lightGreen,
           flipped: flipped,
           selected: selected,
-          serialized: 'G',
         );
 
   Iterable<Coordinate> flips(
@@ -96,6 +108,7 @@ class GreenCell extends Cell {
 
 class RedCell extends Cell {
   static final instance = RedCell();
+  static const String serialized = 'R';
 
   RedCell({flipped = false, selected = false})
       : super(
@@ -103,7 +116,6 @@ class RedCell extends Cell {
           color: Colors.red,
           flipped: flipped,
           selected: selected,
-          serialized: 'R',
         );
 
   Iterable<Coordinate> flips(

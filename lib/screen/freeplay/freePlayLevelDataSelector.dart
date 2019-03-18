@@ -1,7 +1,5 @@
-import 'package:flips/global/theme.dart';
 import 'package:flips/model/board/cell.dart';
-import 'package:flips/model/level/levelData.dart';
-import 'package:flips/widget/leveldata/levelDataBloc.dart';
+import 'package:flips/screen/freeplay/freePlayLevelDataBloc.dart';
 import 'package:flips/screen/home/events.dart';
 import 'package:flips/widget/animation/flipWidget.dart';
 import 'package:flips/widget/board/shapeWidgets.dart';
@@ -17,8 +15,8 @@ class LevelDataSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LevelDataBloc levelDataBloc =
-        LevelDataInheritedWidget.of(context).levelDataBloc;
+    FreePlayLevelDataBloc levelDataBloc =
+        FreePlayLevelDataInheritedWidget.of(context).levelDataBloc;
     SchedulerBinding.instance.scheduleFrameCallback(
         (timestamp) => levelDataBloc.eventSink.add(PushEvent()));
     return DropdownButtonHideUnderline(
@@ -28,11 +26,8 @@ class LevelDataSelector extends StatelessWidget {
             children: [
               StreamBuilder(
                 stream: levelDataBloc.levelDataStream,
-                builder:
-                    (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
-                  int width = snapshot.hasData
-                      ? snapshot.data.width
-                      : LevelDataBloc.widthOptions.first;
+                builder: (BuildContext context, AsyncSnapshot<void> _) {
+                  int width = levelDataBloc.width;
                   return buildNumberSelector(
                       context,
                       "Width",
@@ -46,11 +41,8 @@ class LevelDataSelector extends StatelessWidget {
               ),
               StreamBuilder(
                 stream: levelDataBloc.levelDataStream,
-                builder:
-                    (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
-                  int height = snapshot.hasData
-                      ? snapshot.data.height
-                      : LevelDataBloc.heightOptions.first;
+                builder: (BuildContext context, AsyncSnapshot<void> _) {
+                  int height = levelDataBloc.height;
                   return buildNumberSelector(
                       context,
                       "Height",
@@ -66,7 +58,7 @@ class LevelDataSelector extends StatelessWidget {
             height: _spacingSize,
           ),
           Row(
-            children: LevelDataBloc.cellTypeOptions
+            children: FreePlayLevelDataBloc.cellTypeOptions
                 .map((cellType) => buildCellTypeSelector(
                       levelDataBloc,
                       cellType,
@@ -97,7 +89,7 @@ class LevelDataSelector extends StatelessWidget {
           color: Theme.of(context).accentColor,
           child: DropdownButton<int>(
             iconSize: _fontSize,
-            items: LevelDataBloc.heightOptions.map((item) {
+            items: FreePlayLevelDataBloc.heightOptions.map((item) {
               return DropdownMenuItem<int>(
                 child: Container(
                   child: Text(item.toString()),
@@ -117,15 +109,15 @@ class LevelDataSelector extends StatelessWidget {
     );
   }
 
-  Widget buildCellTypeSelector(LevelDataBloc levelDataBloc, CellType cellType) {
+  Widget buildCellTypeSelector(
+      FreePlayLevelDataBloc levelDataBloc, CellType cellType) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       child: Container(
         child: Center(
           child: StreamBuilder(
               stream: levelDataBloc.levelDataStream,
-              builder:
-                  (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
+              builder: (BuildContext context, AsyncSnapshot<void> _) {
                 return FlipWidget(
                   child1: Container(
                     color: Cell.colorForType(cellType),

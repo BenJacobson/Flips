@@ -1,7 +1,6 @@
-import 'package:flips/model/level/levelData.dart';
 import 'package:flips/screen/level/levelScreen.dart';
-import 'package:flips/widget/leveldata/levelDataBloc.dart';
-import 'package:flips/widget/leveldata/levelDataSelector.dart';
+import 'package:flips/screen/freeplay/freePlayLevelDataBloc.dart';
+import 'package:flips/screen/freeplay/freePlayLevelDataSelector.dart';
 import 'package:flutter/material.dart';
 
 class FreePlayScreen extends StatelessWidget {
@@ -12,8 +11,8 @@ class FreePlayScreen extends StatelessWidget {
         title: Text("Free Play"),
       ),
       backgroundColor: Theme.of(context).backgroundColor,
-      body: LevelDataInheritedWidget(
-        levelDataBloc: LevelDataBloc(),
+      body: FreePlayLevelDataInheritedWidget(
+        levelDataBloc: FreePlayLevelDataBloc(),
         child: _FreePlayWidget(),
       ),
     );
@@ -24,7 +23,8 @@ class FreePlayScreen extends StatelessWidget {
 class _FreePlayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final levelDataBloc = LevelDataInheritedWidget.of(context).levelDataBloc;
+    final levelDataBloc =
+        FreePlayLevelDataInheritedWidget.of(context).levelDataBloc;
     return Column(
       children: [
         Container(
@@ -39,7 +39,7 @@ class _FreePlayWidget extends StatelessWidget {
         LevelDataSelector(),
         StreamBuilder(
             stream: levelDataBloc.levelDataStream,
-            builder: (BuildContext context, AsyncSnapshot<LevelData> snapshot) {
+            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
               return FlatButton(
                 child: Text("Play",
                     style: TextStyle(
@@ -49,8 +49,7 @@ class _FreePlayWidget extends StatelessWidget {
                 onPressed: levelDataBloc.usingAnyCellType()
                     ? () {
                         if (levelDataBloc.usingAnyCellType()) {
-                          gotoLevelScreen(
-                              context, levelDataBloc.getLevelData());
+                          gotoLevelScreen(context, levelDataBloc);
                         }
                       }
                     : null,
@@ -64,15 +63,17 @@ class _FreePlayWidget extends StatelessWidget {
     );
   }
 
-  gotoLevelScreen(BuildContext context, LevelData levelData) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => LevelScreen(LevelData(
-                cellTypes: levelData.cellTypes,
-                height: levelData.height,
-                width: levelData.width,
-              ))),
-    );
+  gotoLevelScreen(
+      BuildContext context, FreePlayLevelDataBloc levelDataBloc) async {
+    bool continuePlaying = true;
+    while (continuePlaying != null && continuePlaying) {
+      continuePlaying = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => LevelScreen(
+                  levelData: levelDataBloc.getLevelData(),
+                )),
+      );
+    }
   }
 }

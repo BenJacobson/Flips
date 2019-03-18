@@ -1,4 +1,3 @@
-import 'package:flips/global/theme.dart';
 import 'package:flips/model/board/cell.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';

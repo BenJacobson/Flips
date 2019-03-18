@@ -1,8 +1,7 @@
 import 'package:flips/model/board/cell.dart';
 import 'package:flips/model/board/coordinate.dart';
+import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flutter/material.dart';
-
-import 'dart:math';
 
 abstract class ImmutableBoard {
   bool getFlipped(int i, int j);
@@ -13,24 +12,24 @@ abstract class ImmutableBoard {
 }
 
 class Board implements ImmutableBoard {
-  static final _rng = new Random();
-  static const _RESET_ITERATIONS_MIN = 8;
-  static const _RESET_ITERATIONS_MAX = 14;
-
-  final int height;
-  final int width;
-
-  final Set<CellType> cellTypes;
-
   List<List<Cell>> _board;
 
+  LevelData levelData;
+
   Board({
-    @required this.height,
-    @required this.width,
-    @required this.cellTypes,
+    @required this.levelData,
   }) {
+    _board = Iterable.generate(levelData.height).map((i) {
+      return Iterable.generate(levelData.width).map((j) {
+        return Cell.fromCellType(levelData.getCellType(i, j));
+      }).toList();
+    }).toList();
     reset();
   }
+
+  int get height => _board.length;
+
+  int get width => height > 0 ? _board[0].length : 0;
 
   Color getColor(int i, int j) => _board[i][j].color;
 
@@ -53,21 +52,23 @@ class Board implements ImmutableBoard {
   }
 
   reset() {
-    _board = List<List<Cell>>.generate(
-        height, (_) => List<Cell>.generate(width, (_) => _newRandomCell()));
-    final iterations = _RESET_ITERATIONS_MIN +
-        _rng.nextInt(_RESET_ITERATIONS_MAX - _RESET_ITERATIONS_MIN);
-    for (int rep = 0; rep < iterations; ++rep) {
-      int i = _rng.nextInt(height);
-      int j = _rng.nextInt(width);
-      flip(i, j);
+    for (int i = 0; i < height; ++i) {
+      for (int j = 0; j < width; ++j) {
+        _board[i][j].selected = false;
+        _board[i][j].flipped = false;
+      }
+    }
+
+    for (int i = 0; i < height; ++i) {
+      for (int j = 0; j < width; ++j) {
+        if (levelData.getSelected(i, j)) {
+          flip(i, j);
+        }
+      }
     }
   }
 
   isCompleted() {
     return _board.every((row) => row.every((cell) => !cell.flipped));
   }
-
-  Cell _newRandomCell() =>
-      Cell.fromCellType(cellTypes.elementAt(_rng.nextInt(cellTypes.length)));
 }

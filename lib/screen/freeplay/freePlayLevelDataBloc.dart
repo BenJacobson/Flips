@@ -1,12 +1,14 @@
 import 'package:flips/global/preferences.dart';
 import 'package:flips/model/board/cell.dart';
-import 'package:flips/model/level/levelData.dart';
+import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flips/screen/home/events.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:async';
+import 'dart:math';
 
-class LevelDataBloc {
+class FreePlayLevelDataBloc {
+  static final _rng = new Random();
   static const List<CellType> cellTypeOptions = const [
     CellType.BLUE,
     CellType.GREEN,
@@ -19,11 +21,14 @@ class LevelDataBloc {
   int _height = heightOptions.first;
   int _width = widthOptions.first;
 
-  final _levelDataStreamController = StreamController<LevelData>.broadcast();
+  int get height => _height;
+  int get width => _width;
 
-  Sink<LevelData> get _levelDataSink => _levelDataStreamController.sink;
+  final _levelDataStreamController = StreamController<void>.broadcast();
 
-  Stream<LevelData> get levelDataStream => _levelDataStreamController.stream;
+  Sink<void> get _levelDataSink => _levelDataStreamController.sink;
+
+  Stream<void> get levelDataStream => _levelDataStreamController.stream;
 
   final _eventStreamController = StreamController<LevelDataEvent>();
 
@@ -31,7 +36,7 @@ class LevelDataBloc {
 
   Stream<LevelDataEvent> get _eventStream => _eventStreamController.stream;
 
-  LevelDataBloc() {
+  FreePlayLevelDataBloc() {
     _eventStream.listen(_transform);
     _loadPreferences();
   }
@@ -70,37 +75,46 @@ class LevelDataBloc {
     } else {
       print("Error: Unknown event received in LevelDataBloc.");
     }
-    _levelDataSink.add(getLevelData());
+    _levelDataSink.add(null);
   }
 
   LevelData getLevelData() {
+    int fraction = _rng.nextInt(3) + 2;
     return LevelData(
-      cellTypes: _cellTypes,
-      height: _height,
-      width: _width,
+      cells: Iterable.generate(_height).map((i) {
+        return Iterable.generate(_width).map((j) {
+          return LevelCell(
+            cellType: _randomCellType(),
+            selected: _rng.nextInt(fraction) == 0,
+          );
+        }).toList();
+      }).toList(),
     );
   }
+
+  CellType _randomCellType() =>
+      _cellTypes.elementAt(_rng.nextInt(_cellTypes.length));
 
   bool usingCellType(CellType cellType) => _cellTypes.contains(cellType);
 
   bool usingAnyCellType() => _cellTypes.length > 0;
 
-  dispose() {
+  close() {
     _levelDataStreamController.close();
     _eventStreamController.close();
   }
 }
 
-class LevelDataInheritedWidget extends InheritedWidget {
-  final LevelDataBloc levelDataBloc;
+class FreePlayLevelDataInheritedWidget extends InheritedWidget {
+  final FreePlayLevelDataBloc levelDataBloc;
 
-  LevelDataInheritedWidget(
+  FreePlayLevelDataInheritedWidget(
       {@required this.levelDataBloc, @required Widget child})
       : super(child: child);
 
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) => true;
 
-  static LevelDataInheritedWidget of(BuildContext context) =>
-      context.inheritFromWidgetOfExactType(LevelDataInheritedWidget);
+  static FreePlayLevelDataInheritedWidget of(BuildContext context) =>
+      context.inheritFromWidgetOfExactType(FreePlayLevelDataInheritedWidget);
 }

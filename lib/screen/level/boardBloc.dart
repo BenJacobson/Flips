@@ -1,6 +1,6 @@
 import 'package:flips/model/board/board.dart';
 import 'package:flips/model/board/cell.dart';
-import 'package:flips/model/level/levelData.dart';
+import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flips/screen/level/events.dart';
 import 'package:flutter/material.dart';
 
@@ -38,9 +38,7 @@ class BoardBloc {
 
   BoardBloc(LevelData levelData)
       : _board = Board(
-          cellTypes: levelData.cellTypes,
-          height: levelData.height,
-          width: levelData.width,
+          levelData: levelData,
         ) {
     _eventStream.listen(_transform);
   }
@@ -69,7 +67,7 @@ class BoardBloc {
     }
   }
 
-  void dispose() {
+  void close() {
     _boardEventController.close();
     _immutableBoardStreamController.close();
     _showHintsStreamController.close();
