@@ -31,6 +31,27 @@ class Preferences {
   static set freePlayBoardWidth(int value) =>
       _setInt(_FREE_PLAY_BOARD_WIDTH, value);
 
+  static Future<bool> getLevelCompleted(String serializedLevelData) =>
+      _getBool(serializedLevelData, false);
+
+  static Future<bool> setLevelCompleted(
+          String serializedLevelData, bool value) =>
+      _setBool(serializedLevelData, value);
+
+  static Future<bool> _getBool(String key, bool fallback) async {
+    try {
+      final sharedPreferences = await SharedPreferences.getInstance();
+      return sharedPreferences.getBool(key) ?? fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  static Future<bool> _setBool(String key, bool value) async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.setBool(key, value);
+  }
+
   static Future<int> _getInt(String key) async {
     try {
       final sharedPreferences = await SharedPreferences.getInstance();

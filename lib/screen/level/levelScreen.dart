@@ -1,4 +1,3 @@
-import 'package:flips/model/board/board.dart';
 import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';
@@ -9,7 +8,9 @@ import 'package:flutter/scheduler.dart';
 class LevelScreen extends StatelessWidget {
   final LevelData levelData;
 
-  LevelScreen({this.levelData});
+  LevelScreen({
+    @required this.levelData,
+  }) : assert(levelData != null);
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +31,15 @@ class _Level extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
+    boardBloc.boardStream.listen((immutableBoard) {
+      if (immutableBoard.isCompleted()) {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => buildLevelCompleteDialog(context, boardBloc),
+        );
+      }
+    });
     SchedulerBinding.instance.scheduleFrameCallback(
         (timestamp) => boardBloc.eventSink.add(PushEvent()));
     return Column(
@@ -37,34 +47,9 @@ class _Level extends StatelessWidget {
         BoardWidget(),
         SizedBox(height: 50),
         _ShowHintsWidget(),
-        _CompletedDialog(),
       ],
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
-    );
-  }
-}
-
-// A dummy widget used only to get a BuildContext for the level completed
-// dialog.
-class _CompletedDialog extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
-    return StreamBuilder(
-      stream: boardBloc.boardStream,
-      builder: (BuildContext context, AsyncSnapshot<ImmutableBoard> snapshot) {
-        if (snapshot.hasData && snapshot.data.isCompleted()) {
-          SchedulerBinding.instance
-              .scheduleFrameCallback((timestamp) => showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (context) =>
-                        buildLevelCompleteDialog(context, boardBloc),
-                  ));
-        }
-        return Container();
-      },
     );
   }
 

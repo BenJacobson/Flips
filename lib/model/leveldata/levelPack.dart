@@ -3,7 +3,8 @@ import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flutter/material.dart';
 
 class LevelPack {
-  static LevelPack fromSerializedLevelPack(String serializedLevelPack) {
+  static Future<LevelPack> fromSerializedLevelPack(
+      String serializedLevelPack) async {
     List<String> lines = serializedLevelPack.split('\n');
     assert(lines.length == 22);
 
@@ -23,14 +24,14 @@ class LevelPack {
     int height = size[0];
     int width = size[1];
 
-    List<LevelData> levelData = lines.skip(2).map((line) {
+    List<LevelData> levelData = await Future.wait(lines.skip(2).map((line) {
       line = line.trim();
       assert(line.split('').fold(
           true,
           (bool good, String c) =>
               cellTypes.contains(Cell.deserializeCellType(c)) && good));
       return LevelData.fromSerializedLevelData(height, width, line);
-    }).toList();
+    }));
 
     return LevelPack._internal(
       cellTypes: cellTypes,
@@ -45,15 +46,25 @@ class LevelPack {
   final int height;
   final int width;
 
+  int _numCompleted = 0;
+
   LevelPack._internal({
     @required cellTypes,
     @required levelData,
     @required this.height,
     @required this.width,
   })  : _cellTypes = cellTypes,
-        _levelData = levelData;
+        _levelData = levelData {
+    _levelData.forEach((levelData) {
+      if (levelData.completed) {
+        _numCompleted++;
+      }
+    });
+  }
 
-  int get length => _levelData.length;
+  int get numLevels => _levelData.length;
+
+  int get numCompleted => _numCompleted;
 
   LevelData operator [](int index) => _levelData[index];
 

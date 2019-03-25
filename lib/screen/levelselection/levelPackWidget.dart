@@ -37,6 +37,15 @@ class LevelPackWidget extends StatelessWidget {
                       fontSize: 32.0,
                     ),
                   ),
+                  Text(
+                    levelPack.numCompleted.toString() +
+                        "/" +
+                        levelPack.numLevels.toString(),
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                      fontSize: 32.0,
+                    ),
+                  ),
                 ])
                 .toList(),
             spacing: 10.0,
@@ -46,7 +55,7 @@ class LevelPackWidget extends StatelessWidget {
             height: 16.0,
           ),
           Wrap(
-            children: Iterable.generate(levelPack.length).map((i) {
+            children: Iterable.generate(levelPack.numLevels).map((i) {
               return _LevelDataWidget(
                 levelData: levelPack[i],
                 displayName: (i + 1).toString(),
@@ -82,7 +91,9 @@ class _LevelDataWidget extends StatelessWidget {
             fontSize: 32.0,
           ),
         ),
-        color: Theme.of(context).primaryColor,
+        color: levelData.completed
+            ? Theme.of(context).backgroundColor
+            : Theme.of(context).primaryColor,
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (BuildContext context) {

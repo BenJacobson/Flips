@@ -9,10 +9,6 @@ import 'dart:async';
 class BoardBloc {
   final Board _board;
 
-  int get width => _board.width;
-
-  int get height => _board.height;
-
   bool _showHints = false;
 
   final _boardEventController = StreamController<BoardEvent>();
@@ -43,6 +39,10 @@ class BoardBloc {
     _eventStream.listen(_transform);
   }
 
+  int get width => _board.width;
+
+  int get height => _board.height;
+
   Color getColor(int i, int j) => _board.getColor(i, j);
 
   CellType getCellType(int i, int j) => _board.getCellType(i, j);
@@ -51,6 +51,9 @@ class BoardBloc {
     if (event is FlipEvent) {
       _board.flip(event.i, event.j);
       _boardSink.add(_board);
+      if (_board.isCompleted()) {
+        _board.levelData.setCompleted(true);
+      }
     } else if (event is HintsEvent) {
       _showHints = event.showHints;
       _showHintsSink.add(_showHints);
