@@ -2,6 +2,7 @@ import 'package:flips/screen/level/levelScreen.dart';
 import 'package:flips/model/board/cell.dart';
 import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flips/model/leveldata/levelPack.dart';
+import 'package:flips/widget/animation/expandable.dart';
 import 'package:flutter/material.dart';
 
 class LevelPackWidget extends StatelessWidget {
@@ -13,63 +14,59 @@ class LevelPackWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Wrap(
-            children: CellType.values
-                .where((cellType) => levelPack.usesCellType(cellType))
-                .map((cellType) {
-                  return Container(
-                    color: Cell.colorForType(cellType),
-                    height: 40.0,
-                    width: 40.0,
-                  );
-                })
-                .cast<Widget>()
-                .followedBy([
-                  Text(
-                    levelPack.width.toString() +
-                        "×" +
-                        levelPack.height.toString(),
-                    style: TextStyle(
-                      color: Theme.of(context).accentColor,
-                      fontSize: 32.0,
-                    ),
-                  ),
-                  Text(
-                    levelPack.numCompleted.toString() +
-                        "/" +
-                        levelPack.numLevels.toString(),
-                    style: TextStyle(
-                      color: Theme.of(context).accentColor,
-                      fontSize: 32.0,
-                    ),
-                  ),
-                ])
-                .toList(),
-            spacing: 10.0,
-            runSpacing: 10.0,
-          ),
-          SizedBox(
-            height: 16.0,
-          ),
-          Wrap(
-            children: Iterable.generate(levelPack.numLevels).map((i) {
-              return _LevelDataWidget(
-                levelData: levelPack[i],
-                displayName: (i + 1).toString(),
-              );
-            }).toList(),
-            spacing: 10.0,
-            runSpacing: 10.0,
-            alignment: WrapAlignment.spaceBetween,
-          ),
-        ],
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-      ),
-      margin: EdgeInsets.all(16.0),
+    return Expandable(
+      header: this.buildHeader(context),
+      content: this.buildLevels(),
+    );
+  }
+
+  Widget buildHeader(BuildContext context) {
+    return Wrap(
+      children: CellType.values
+          .where((cellType) => levelPack.usesCellType(cellType))
+          .map((cellType) {
+            return Container(
+              color: Cell.colorForType(cellType),
+              height: 40.0,
+              width: 40.0,
+            );
+          })
+          .cast<Widget>()
+          .followedBy([
+            Text(
+              levelPack.width.toString() + "×" + levelPack.height.toString(),
+              style: TextStyle(
+                color: Theme.of(context).accentColor,
+                fontSize: 32.0,
+              ),
+            ),
+            Text(
+              levelPack.numCompleted.toString() +
+                  "/" +
+                  levelPack.numLevels.toString(),
+              style: TextStyle(
+                color: Theme.of(context).accentColor,
+                fontSize: 32.0,
+              ),
+            ),
+          ])
+          .toList(),
+      spacing: 10.0,
+      runSpacing: 10.0,
+    );
+  }
+
+  Widget buildLevels() {
+    return Wrap(
+      children: Iterable.generate(levelPack.numLevels).map((i) {
+        return _LevelDataWidget(
+          levelData: levelPack[i],
+          displayName: (i + 1).toString(),
+        );
+      }).toList(),
+      spacing: 10.0,
+      runSpacing: 10.0,
+      alignment: WrapAlignment.spaceBetween,
     );
   }
 }
