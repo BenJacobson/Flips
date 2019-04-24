@@ -1,5 +1,6 @@
 import 'package:flips/screen/levelselection/levelPackWidget.dart';
 import 'package:flips/screen/levelselection/levelSelectionBloc.dart';
+import 'package:flips/widget/animation/expandable.dart';
 import 'package:flutter/material.dart';
 
 class LevelSelectionScreen extends StatelessWidget {
@@ -32,6 +33,7 @@ class _LevelSelectionWidget extends StatelessWidget {
           children: levelSelectionBloc.levelPackOrder
               .map((levelPackName) => LevelPackWidget(
                     levelPack: levelSelectionBloc.levelPacks[levelPackName],
+                    expandState: ExpandState(),
                   ))
               .toList(),
         );

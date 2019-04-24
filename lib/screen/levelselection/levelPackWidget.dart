@@ -7,16 +7,21 @@ import 'package:flutter/material.dart';
 
 class LevelPackWidget extends StatelessWidget {
   final LevelPack levelPack;
+  final ExpandState expandState;
 
-  LevelPackWidget({@required this.levelPack}) {
+  LevelPackWidget({
+    @required this.levelPack,
+    this.expandState,
+  }) {
     assert(levelPack != null);
   }
 
   @override
   Widget build(BuildContext context) {
     return Expandable(
-      header: this.buildHeader(context),
-      content: this.buildLevels(),
+      header: buildHeader(context),
+      content: buildLevels(),
+      expandState: expandState,
     );
   }
 
