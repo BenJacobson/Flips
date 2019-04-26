@@ -21,6 +21,7 @@ class Expandable extends StatelessWidget {
         children: [
           GestureDetector(
             child: header,
+            behavior: HitTestBehavior.opaque,
             onTap: expandState.toggle,
           ),
           SizedBox(

@@ -26,7 +26,7 @@ class LevelPackWidget extends StatelessWidget {
   }
 
   Widget buildHeader(BuildContext context) {
-    return Wrap(
+    return Row(
       children: CellType.values
           .where((cellType) => levelPack.usesCellType(cellType))
           .map((cellType) {
@@ -38,6 +38,7 @@ class LevelPackWidget extends StatelessWidget {
           })
           .cast<Widget>()
           .followedBy([
+            Spacer(),
             Text(
               levelPack.width.toString() + "×" + levelPack.height.toString(),
               style: TextStyle(
@@ -45,6 +46,7 @@ class LevelPackWidget extends StatelessWidget {
                 fontSize: 32.0,
               ),
             ),
+            Spacer(),
             Text(
               levelPack.numCompleted.toString() +
                   "/" +
@@ -56,8 +58,6 @@ class LevelPackWidget extends StatelessWidget {
             ),
           ])
           .toList(),
-      spacing: 10.0,
-      runSpacing: 10.0,
     );
   }
 
