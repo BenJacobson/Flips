@@ -27,7 +27,10 @@ class _FlipState extends State<FlipWidget> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     animationController = AnimationController(
-        duration: const Duration(milliseconds: 250), vsync: this);
+      duration: const Duration(milliseconds: 250),
+      value: widget.flipped ? 1.0 : 0.0,
+      vsync: this,
+    );
     animation =
         CurvedAnimation(parent: animationController, curve: Curves.linear);
   }

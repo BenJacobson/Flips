@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flips/model/board/cell.dart';
 import 'package:flips/widget/animation/flipWidget.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,6 @@ class FlipsLogo extends StatelessWidget {
         return _LogoLetter(
           letter: text[i],
           color: colors[i],
-          flipped: i == text.length - 1,
         );
       }).toList(),
       mainAxisAlignment: MainAxisAlignment.center,
@@ -31,23 +31,20 @@ class FlipsLogo extends StatelessWidget {
 class _LogoLetter extends StatefulWidget {
   final String letter;
   final Color color;
-  final bool flipped;
 
-  _LogoLetter({this.letter, this.color, this.flipped});
+  _LogoLetter({this.letter, this.color});
 
   @override
   State<StatefulWidget> createState() {
-    return _LogoLetterState(
-      flipped: flipped,
-    );
+    return _LogoLetterState();
   }
 }
 
 class _LogoLetterState extends State<_LogoLetter> {
-  bool flipped;
+  bool flipped = true;
   Offset offset = Offset.zero;
 
-  _LogoLetterState({this.flipped = false});
+  _LogoLetterState();
 
   @override
   void initState() {
@@ -57,6 +54,9 @@ class _LogoLetterState extends State<_LogoLetter> {
         offset = Offset(context.size.width / 2, context.size.height / 2);
       });
     });
+    Timer(Duration(seconds: 1), () => setState(() {
+      flipped = false;
+    }));
   }
 
   @override
