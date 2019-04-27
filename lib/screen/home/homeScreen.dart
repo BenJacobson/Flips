@@ -1,4 +1,5 @@
 import 'package:flips/screen/freeplay/freePlayScreen.dart';
+import 'package:flips/screen/home/flipsLogo.dart';
 import 'package:flips/screen/levelselection/levelSelectionScreen.dart';
 import 'package:flutter/material.dart';
 
@@ -21,13 +22,7 @@ class _Home extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          Text("Flips",
-              style: TextStyle(
-                color: Theme.of(context).accentColor,
-                fontSize: 128.0,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.bold,
-              )),
+          FlipsLogo(),
           Wrap(
             children: [
               FlatButton(
