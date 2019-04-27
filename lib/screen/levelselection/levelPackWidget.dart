@@ -106,6 +106,10 @@ class _LevelDataWidget extends StatelessWidget {
           ));
         },
       ),
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).primaryColor),
+        borderRadius: BorderRadius.all(Radius.circular(4.0))
+      ),
       height: 48.0,
       width: 80.0,
     );
