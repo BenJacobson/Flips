@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 class LevelPack {
   static Future<LevelPack> fromSerializedLevelPack(
       String serializedLevelPack) async {
-    List<String> lines = serializedLevelPack.split('\n');
+    List<String> lines = serializedLevelPack
+        .split('\n')
+        .map((level) => level.trim())
+        .where((level) => level.isNotEmpty)
+        .toList();
     assert(lines.length == 22);
 
     Set<CellType> cellTypes = lines[0]

@@ -25,39 +25,49 @@ class LevelPackWidget extends StatelessWidget {
     );
   }
 
+  Iterable<Widget> generateCellWidgets(BuildContext context) sync* {
+    bool first = true;
+    for (final cellType in CellType.values) {
+      if (first) {
+        first = false;
+      } else {
+        yield SizedBox(
+          width: 10.0,
+        );
+      }
+      Color color = levelPack.usesCellType(cellType)
+          ? Cell.colorForType(cellType)
+          : Theme.of(context).disabledColor;
+      yield Container(
+        color: color,
+        height: 40.0,
+        width: 40.0,
+      );
+    }
+  }
+
   Widget buildHeader(BuildContext context) {
     return Row(
-      children: CellType.values
-          .where((cellType) => levelPack.usesCellType(cellType))
-          .map((cellType) {
-            return Container(
-              color: Cell.colorForType(cellType),
-              height: 40.0,
-              width: 40.0,
-            );
-          })
-          .cast<Widget>()
-          .followedBy([
-            Spacer(),
-            Text(
-              levelPack.width.toString() + "×" + levelPack.height.toString(),
-              style: TextStyle(
-                color: Theme.of(context).accentColor,
-                fontSize: 32.0,
-              ),
-            ),
-            Spacer(),
-            Text(
-              levelPack.numCompleted.toString() +
-                  "/" +
-                  levelPack.numLevels.toString(),
-              style: TextStyle(
-                color: Theme.of(context).accentColor,
-                fontSize: 32.0,
-              ),
-            ),
-          ])
-          .toList(),
+      children: generateCellWidgets(context).cast<Widget>().followedBy([
+        Spacer(),
+        Text(
+          levelPack.width.toString() + "×" + levelPack.height.toString(),
+          style: TextStyle(
+            color: Theme.of(context).accentColor,
+            fontSize: 32.0,
+          ),
+        ),
+        Spacer(),
+        Text(
+          levelPack.numCompleted.toString() +
+              "/" +
+              levelPack.numLevels.toString(),
+          style: TextStyle(
+            color: Theme.of(context).accentColor,
+            fontSize: 32.0,
+          ),
+        ),
+      ]).toList(),
     );
   }
 
@@ -107,9 +117,8 @@ class _LevelDataWidget extends StatelessWidget {
         },
       ),
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.all(Radius.circular(4.0))
-      ),
+          border: Border.all(color: Theme.of(context).primaryColor),
+          borderRadius: BorderRadius.all(Radius.circular(4.0))),
       height: 48.0,
       width: 80.0,
     );

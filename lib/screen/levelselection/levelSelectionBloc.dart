@@ -22,7 +22,11 @@ class LevelSelectionBloc {
 
   Future<void> _loadLevels() async {
     String levelPacksFile = await _loadFile(_manifest);
-    levelPacksFile.split("\n").forEach(levelPackOrder.add);
+    levelPacksFile
+        .split("\n")
+        .map((levelPack) => levelPack.trim())
+        .where((levelPack) => levelPack.isNotEmpty)
+        .forEach(levelPackOrder.add);
     await Future.wait(levelPackOrder.map((levelPackFile) async {
       String serializedLevelPack = await _loadFile(levelPackFile);
       if (serializedLevelPack != null) {

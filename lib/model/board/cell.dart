@@ -2,8 +2,8 @@ import 'package:flips/model/board/coordinate.dart';
 import 'package:flutter/material.dart';
 
 enum CellType {
-  BLUE,
   GREEN,
+  BLUE,
   RED,
 }
 
