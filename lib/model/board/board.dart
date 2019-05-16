@@ -12,19 +12,12 @@ abstract class ImmutableBoard {
 }
 
 class Board implements ImmutableBoard {
-  List<List<Cell>> _board;
+  List<List<Cell>> _board = List.generate(0, null);
 
   LevelData levelData;
 
-  Board({
-    @required this.levelData,
-  }) {
-    _board = Iterable.generate(levelData.height).map((i) {
-      return Iterable.generate(levelData.width).map((j) {
-        return Cell.fromCellType(levelData.getCellType(i, j));
-      }).toList();
-    }).toList();
-    reset();
+  Board({LevelData levelData}) {
+    loadLevelData(levelData);
   }
 
   int get height => _board.length;
@@ -51,7 +44,27 @@ class Board implements ImmutableBoard {
     }
   }
 
+  loadLevelData(LevelData newLevelData) {
+    levelData = newLevelData;
+
+    if (levelData == null) {
+      _board = List.generate(0, null);
+      return;
+    }
+
+    _board = Iterable.generate(levelData.height).map((i) {
+      return Iterable.generate(levelData.width).map((j) {
+        return Cell.fromCellType(levelData.getCellType(i, j));
+      }).toList();
+    }).toList();
+    reset();
+  }
+
   reset() {
+    if (levelData == null) {
+      return;
+    }
+
     for (int i = 0; i < height; ++i) {
       for (int j = 0; j < width; ++j) {
         _board[i][j].selected = false;
