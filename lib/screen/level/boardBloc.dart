@@ -1,6 +1,6 @@
 import 'package:flips/model/board/board.dart';
 import 'package:flips/model/board/cell.dart';
-import 'package:flips/model/leveldata/levelData.dart';
+import 'package:flips/model/leveldata/levelSequencer.dart';
 import 'package:flips/screen/level/events.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +10,8 @@ class BoardBloc {
   final Board _board;
 
   bool _showHints = false;
+
+  final LevelSequencer _levelSequencer;
 
   final _boardEventController = StreamController<BoardEvent>();
 
@@ -32,10 +34,11 @@ class BoardBloc {
 
   Stream<bool> get showHintsStream => _showHintsStreamController.stream;
 
-  BoardBloc(LevelData levelData)
+  BoardBloc(LevelSequencer levelSequencer)
       : _board = Board(
-          levelData: levelData,
-        ) {
+          levelData: levelSequencer.getCurrentLevel(),
+        ),
+        _levelSequencer = levelSequencer {
     _eventStream.listen(_transform);
   }
 
@@ -57,6 +60,11 @@ class BoardBloc {
     } else if (event is HintsEvent) {
       _showHints = event.showHints;
       _showHintsSink.add(_showHints);
+    } else if (event is NextLevelEvent) {
+      _showHints = false;
+      _showHintsSink.add(_showHints);
+      _board.loadLevelData(_levelSequencer.getNextLevel());
+      _boardSink.add(_board);
     } else if (event is PushEvent) {
       _showHintsSink.add(_showHints);
       _boardSink.add(_board);

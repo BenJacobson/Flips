@@ -19,7 +19,6 @@ class FreePlayScreen extends StatelessWidget {
   }
 }
 
-//
 class _FreePlayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -67,11 +66,12 @@ class _FreePlayWidget extends StatelessWidget {
       BuildContext context, FreePlayLevelDataBloc levelDataBloc) async {
     bool continuePlaying = true;
     while (continuePlaying != null && continuePlaying) {
+      levelDataBloc.getNextLevel();
       continuePlaying = await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => LevelScreen(
-                  levelData: levelDataBloc.getLevelData(),
+                  levelSequencer: levelDataBloc,
                 )),
       );
     }

@@ -1,4 +1,4 @@
-import 'package:flips/model/leveldata/levelData.dart';
+import 'package:flips/model/leveldata/levelSequencer.dart';
 import 'package:flips/screen/level/boardBloc.dart';
 import 'package:flips/screen/level/events.dart';
 import 'package:flips/widget/board/boardWidget.dart';
@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class LevelScreen extends StatelessWidget {
-  final LevelData levelData;
+  final LevelSequencer levelSequencer;
 
   LevelScreen({
-    @required this.levelData,
-  }) : assert(levelData != null);
+    @required this.levelSequencer,
+  }) : assert(levelSequencer != null);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class LevelScreen extends StatelessWidget {
       ),
       backgroundColor: Theme.of(context).backgroundColor,
       body: BoardBlocInheritedWidget(
-        boardBloc: BoardBloc(levelData),
+        boardBloc: BoardBloc(levelSequencer),
         child: _Level(),
       ),
     );
@@ -68,7 +68,7 @@ class _Level extends StatelessWidget {
           child: Text('Yes'),
           onPressed: () {
             Navigator.of(context).pop(); // Pop the dialog.
-            Navigator.of(context).pop(true); // Pop the level screen.
+            boardBloc.eventSink.add(NextLevelEvent());
           },
           textColor: Colors.black,
         ),

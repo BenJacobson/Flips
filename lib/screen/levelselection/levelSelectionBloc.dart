@@ -1,23 +1,78 @@
+import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flips/model/leveldata/levelPack.dart';
+import 'package:flips/model/leveldata/levelSequencer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'dart:async';
 
-class LevelSelectionBloc {
+bool isInRange(int val, int low, int high) => val >= low && val <= high;
+
+class LevelSelectionBloc with LevelSequencer {
   final String _root = "leveldata/";
   final String _manifest = "manifest";
-  final List<String> levelPackOrder = List();
-  final Map<String, LevelPack> levelPacks = Map();
+  final List<String> levelPackOrder = List<String>();
+  final Map<String, LevelPack> levelPacks = Map<String, LevelPack>();
 
   AssetBundle _assetBundle;
   Future<void> _loaded;
+  int _levelPackIndex = 0;
+  int _levelDataIndex = 0;
 
   Future<void> get loaded => _loaded;
 
   LevelSelectionBloc({AssetBundle assetBundle}) {
     _assetBundle = assetBundle;
     _loaded = _loadLevels();
+  }
+
+  void setLevel(int levelPackIndex, int levelDataIndex) {
+    if (!isInRange(levelPackIndex, 0, levelPackOrder.length-1)) {
+      return;
+    }
+
+    LevelPack levelPack = levelPacks[levelPackOrder[_levelPackIndex]];
+    if (!isInRange(levelDataIndex, 0, levelPack.numLevels-1)) {
+      return;
+    }
+
+    _levelPackIndex = levelPackIndex;
+    _levelDataIndex = levelDataIndex;
+  }
+
+  LevelData getCurrentLevel() {
+    if (!isInRange(_levelPackIndex, 0, levelPackOrder.length-1)) {
+      return null;
+    }
+
+    LevelPack levelPack = levelPacks[levelPackOrder[_levelPackIndex]];
+    if (!isInRange(_levelDataIndex, 0, levelPack.numLevels-1)) {
+      return null;
+    }
+
+    return levelPack[_levelDataIndex];
+  }
+
+  LevelData getNextLevel() {
+    if (!isInRange(_levelPackIndex, 0, levelPackOrder.length-1)) {
+      return null;
+    }
+
+    _levelDataIndex++;
+    LevelPack levelPack = levelPacks[levelPackOrder[_levelPackIndex]];
+    if (!isInRange(_levelDataIndex, 0, levelPack.numLevels-1)) {
+      _levelPackIndex++;
+      _levelDataIndex = 0;
+      if (!isInRange(_levelPackIndex, 0, levelPackOrder.length-1)) {
+        return null;
+      }
+      levelPack = levelPacks[levelPackOrder[_levelPackIndex]];
+      if (!isInRange(_levelDataIndex, 0, levelPack.numLevels-1)) {
+        return null;
+      }
+    }
+
+    return levelPack[_levelDataIndex];
   }
 
   Future<void> _loadLevels() async {

@@ -1,20 +1,22 @@
-import 'package:flips/screen/level/levelScreen.dart';
 import 'package:flips/model/board/cell.dart';
 import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flips/model/leveldata/levelPack.dart';
 import 'package:flips/widget/animation/expandable.dart';
 import 'package:flutter/material.dart';
 
+typedef LevelSelectedCallback = void Function(int);
+
 class LevelPackWidget extends StatelessWidget {
   final LevelPack levelPack;
   final ExpandState expandState;
+  final LevelSelectedCallback onLevelSelected;
 
   LevelPackWidget({
     @required this.levelPack,
     this.expandState,
-  }) {
-    assert(levelPack != null);
-  }
+    @required this.onLevelSelected,
+  })  : assert(levelPack != null),
+        assert(onLevelSelected != null);
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +79,7 @@ class LevelPackWidget extends StatelessWidget {
         return _LevelDataWidget(
           levelData: levelPack[i],
           displayName: (i + 1).toString(),
+          onLevelSelected: () => onLevelSelected(i),
         );
       }).toList(),
       spacing: 10.0,
@@ -89,8 +92,13 @@ class LevelPackWidget extends StatelessWidget {
 class _LevelDataWidget extends StatelessWidget {
   final String displayName;
   final LevelData levelData;
+  final VoidCallback onLevelSelected;
 
-  _LevelDataWidget({this.levelData, this.displayName});
+  _LevelDataWidget({
+    @required this.levelData,
+    @required this.displayName,
+    @required this.onLevelSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -106,15 +114,7 @@ class _LevelDataWidget extends StatelessWidget {
         color: levelData.completed
             ? Theme.of(context).backgroundColor
             : Theme.of(context).primaryColor,
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (BuildContext context) {
-              return LevelScreen(
-                levelData: levelData,
-              );
-            },
-          ));
-        },
+        onPressed: onLevelSelected,
       ),
       decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).primaryColor),

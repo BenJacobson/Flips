@@ -1,3 +1,4 @@
+import 'package:flips/screen/level/levelScreen.dart';
 import 'package:flips/screen/levelselection/levelPackWidget.dart';
 import 'package:flips/screen/levelselection/levelSelectionBloc.dart';
 import 'package:flips/widget/animation/expandable.dart';
@@ -30,10 +31,22 @@ class _LevelSelectionWidget extends StatelessWidget {
       future: levelSelectionBloc.loaded,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         return ListView(
-          children: levelSelectionBloc.levelPackOrder
-              .map((levelPackName) => LevelPackWidget(
-                    levelPack: levelSelectionBloc.levelPacks[levelPackName],
+          children: Iterable.generate(levelSelectionBloc.levelPackOrder.length)
+              .map((levelPackIndex) => LevelPackWidget(
+                    levelPack: levelSelectionBloc.levelPacks[
+                        levelSelectionBloc.levelPackOrder[levelPackIndex]],
                     expandState: ExpandState(),
+                    onLevelSelected: (levelDataIndex) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          levelSelectionBloc.setLevel(
+                              levelPackIndex, levelDataIndex);
+                          return LevelScreen(
+                            levelSequencer: levelSelectionBloc,
+                          );
+                        },
+                      ));
+                    },
                   ))
               .toList(),
         );

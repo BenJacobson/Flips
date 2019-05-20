@@ -1,13 +1,14 @@
 import 'package:flips/global/preferences.dart';
 import 'package:flips/model/board/cell.dart';
 import 'package:flips/model/leveldata/levelData.dart';
+import 'package:flips/model/leveldata/levelSequencer.dart';
 import 'package:flips/screen/home/events.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:async';
 import 'dart:math';
 
-class FreePlayLevelDataBloc {
+class FreePlayLevelDataBloc with LevelSequencer {
   static final _rng = new Random();
   static const List<CellType> cellTypeOptions = const [
     CellType.BLUE,
@@ -17,29 +18,30 @@ class FreePlayLevelDataBloc {
   static const List<int> heightOptions = const [4, 5, 6];
   static const List<int> widthOptions = const [4, 5, 6];
 
+  final _levelDataStreamController = StreamController<void>.broadcast();
+  final _eventStreamController = StreamController<LevelDataEvent>();
+  LevelData _levelData;
   Set<CellType> _cellTypes = Set<CellType>.of(cellTypeOptions);
   int _height = heightOptions.first;
   int _width = widthOptions.first;
 
-  int get height => _height;
-  int get width => _width;
+  FreePlayLevelDataBloc() {
+    getNextLevel();
+    _eventStream.listen(_transform);
+    _loadPreferences();
+  }
 
-  final _levelDataStreamController = StreamController<void>.broadcast();
+  int get height => _height;
+
+  int get width => _width;
 
   Sink<void> get _levelDataSink => _levelDataStreamController.sink;
 
   Stream<void> get levelDataStream => _levelDataStreamController.stream;
 
-  final _eventStreamController = StreamController<LevelDataEvent>();
-
   Sink<LevelDataEvent> get eventSink => _eventStreamController.sink;
 
   Stream<LevelDataEvent> get _eventStream => _eventStreamController.stream;
-
-  FreePlayLevelDataBloc() {
-    _eventStream.listen(_transform);
-    _loadPreferences();
-  }
 
   _loadPreferences() async {
     final cellTypes = await Preferences.freePlayBoardCells;
@@ -78,11 +80,13 @@ class FreePlayLevelDataBloc {
     _levelDataSink.add(null);
   }
 
-  LevelData getLevelData() {
+  LevelData getCurrentLevel() => _levelData;
+
+  LevelData getNextLevel() {
     int fraction = _rng.nextInt(3) + 2;
-    return LevelData(
-      cells: Iterable.generate(_height).map((i) {
-        return Iterable.generate(_width).map((j) {
+    _levelData = LevelData(
+      cells: Iterable.generate(height).map((i) {
+        return Iterable.generate(width).map((j) {
           return LevelCell(
             cellType: _randomCellType(),
             selected: _rng.nextInt(fraction) == 0,
@@ -90,6 +94,7 @@ class FreePlayLevelDataBloc {
         }).toList();
       }).toList(),
     );
+    return _levelData;
   }
 
   CellType _randomCellType() =>

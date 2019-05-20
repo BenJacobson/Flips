@@ -35,8 +35,8 @@ class LevelData {
 
   LevelData({
     @required cells,
-    @required completed,
-    @required this.serializedLevelData,
+    completed = false,
+    this.serializedLevelData = "",
   })  : _cells = cells,
         _completed = completed {
     assert(height > 0);

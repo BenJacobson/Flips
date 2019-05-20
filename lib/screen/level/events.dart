@@ -13,6 +13,8 @@ class HintsEvent extends BoardEvent {
   HintsEvent(this.showHints);
 }
 
+class NextLevelEvent extends BoardEvent {}
+
 class PushEvent extends BoardEvent {}
 
 class ResetEvent extends BoardEvent {}
