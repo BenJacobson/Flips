@@ -7,27 +7,38 @@ import 'package:flutter/scheduler.dart';
 
 class LevelScreen extends StatelessWidget {
   final LevelSequencer levelSequencer;
+  final LevelScreenStrings levelScreenStrings;
 
   LevelScreen({
     @required this.levelSequencer,
-  }) : assert(levelSequencer != null);
+    @required this.levelScreenStrings,
+  })  : assert(levelSequencer != null),
+        assert(levelScreenStrings != null);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Free Play"),
+        title: Text(levelScreenStrings.title),
       ),
       backgroundColor: Theme.of(context).backgroundColor,
       body: BoardBlocInheritedWidget(
         boardBloc: BoardBloc(levelSequencer),
-        child: _Level(),
+        child: _Level(
+          levelScreenStrings: levelScreenStrings,
+        ),
       ),
     );
   }
 }
 
 class _Level extends StatelessWidget {
+  final LevelScreenStrings levelScreenStrings;
+
+  _Level({
+    @required this.levelScreenStrings,
+  }) : assert(levelScreenStrings != null);
+
   @override
   Widget build(BuildContext context) {
     BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
@@ -54,28 +65,44 @@ class _Level extends StatelessWidget {
   }
 
   Widget buildLevelCompleteDialog(BuildContext context, BoardBloc boardBloc) {
-    return AlertDialog(
-      actions: <Widget>[
-        FlatButton(
-          child: Text('No'),
-          onPressed: () {
-            Navigator.of(context).pop(); // Pop the dialog.
-            Navigator.of(context).pop(false); // Pop the level screen.
-          },
-          textColor: Colors.black,
-        ),
-        FlatButton(
-          child: Text('Yes'),
-          onPressed: () {
-            Navigator.of(context).pop(); // Pop the dialog.
-            boardBloc.eventSink.add(NextLevelEvent());
-          },
-          textColor: Colors.black,
-        ),
-      ],
-      content: Text("Play Again?"),
-      title: Text("Level Complete!"),
-    );
+    if (boardBloc.hasNextLevel()) {
+      return AlertDialog(
+        actions: <Widget>[
+          FlatButton(
+            child: Text(levelScreenStrings.nextLevelNegative),
+            onPressed: () {
+              Navigator.of(context).pop(); // Pop the dialog.
+              Navigator.of(context).pop(); // Pop the level screen.
+            },
+            textColor: Colors.black,
+          ),
+          FlatButton(
+            child: Text(levelScreenStrings.nextLevelAffirmative),
+            onPressed: () {
+              Navigator.of(context).pop(); // Pop the dialog.
+              boardBloc.eventSink.add(NextLevelEvent());
+            },
+            textColor: Colors.black,
+          ),
+        ],
+        content: Text(levelScreenStrings.nextLevelContent),
+        title: Text(levelScreenStrings.nextLevelTitle),
+      );
+    } else {
+      return AlertDialog(
+        actions: <Widget>[
+          FlatButton(
+            child: Text(levelScreenStrings.noNextLevelConfirm),
+            onPressed: () {
+              Navigator.of(context).pop(); // Pop the dialog.
+              Navigator.of(context).pop(); // Pop the level screen.
+            },
+            textColor: Colors.black,
+          ),
+        ],
+        title: Text(levelScreenStrings.noNextLevelTitle),
+      );
+    }
   }
 }
 
@@ -113,4 +140,30 @@ class _ShowHintsWidget extends StatelessWidget {
       },
     );
   }
+}
+
+class LevelScreenStrings {
+  final String title;
+  final String nextLevelTitle;
+  final String nextLevelContent;
+  final String nextLevelAffirmative;
+  final String nextLevelNegative;
+  final String noNextLevelTitle;
+  final String noNextLevelConfirm;
+
+  LevelScreenStrings({
+    @required this.title,
+    @required this.nextLevelTitle,
+    @required this.nextLevelContent,
+    @required this.nextLevelAffirmative,
+    @required this.nextLevelNegative,
+    @required this.noNextLevelTitle,
+    @required this.noNextLevelConfirm,
+  })  : assert(title != null),
+        assert(nextLevelTitle != null),
+        assert(nextLevelContent != null),
+        assert(nextLevelAffirmative != null),
+        assert(nextLevelNegative != null),
+        assert(noNextLevelTitle != null),
+        assert(noNextLevelConfirm != null);
 }

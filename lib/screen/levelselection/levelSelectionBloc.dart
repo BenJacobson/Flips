@@ -75,6 +75,21 @@ class LevelSelectionBloc with LevelSequencer {
     return levelPack[_levelDataIndex];
   }
 
+  bool hasNextLevel() {
+    if (!isInRange(_levelPackIndex, 0, levelPackOrder.length-1)) {
+      return false;
+    }
+    LevelPack levelPack = levelPacks[levelPackOrder[_levelPackIndex]];
+    if (isInRange(_levelDataIndex+1, 0, levelPack.numLevels-1)) {
+      return true;
+    }
+    if (!isInRange(_levelPackIndex+1, 0, levelPackOrder.length-1)) {
+      return false;
+    }
+    levelPack = levelPacks[levelPackOrder[_levelPackIndex+1]];
+    return isInRange(0, 0, levelPack.numLevels-1);
+  }
+
   Future<void> _loadLevels() async {
     String levelPacksFile = await _loadFile(_manifest);
     levelPacksFile

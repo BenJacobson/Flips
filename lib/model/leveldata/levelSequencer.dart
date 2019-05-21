@@ -6,4 +6,7 @@ abstract class LevelSequencer {
 
   // Advances to the next level and returns the new level.
   LevelData getNextLevel();
+
+  // Whether there is a next level.
+  bool hasNextLevel();
 }

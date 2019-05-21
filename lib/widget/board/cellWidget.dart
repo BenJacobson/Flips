@@ -38,6 +38,13 @@ class _CellState extends State<CellWidget> {
       BoardBloc boardBloc = BoardBlocInheritedWidget.of(context).boardBloc;
 
       boardBloc.boardStream.listen((board) {
+        // TODO: clean up old listeners or reuse cell widgets for new boards.
+        if (!(0 <= widget.i &&
+            widget.i < boardBloc.height &&
+            0 <= widget.j &&
+            widget.j < boardBloc.width)) {
+          return;
+        }
         CellType newCellType = boardBloc.getCellType(widget.i, widget.j);
         bool newFlipped = board.getFlipped(widget.i, widget.j);
         bool newSelected = board.getSelected(widget.i, widget.j);

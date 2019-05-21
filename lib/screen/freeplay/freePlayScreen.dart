@@ -48,7 +48,22 @@ class _FreePlayWidget extends StatelessWidget {
                 onPressed: levelDataBloc.usingAnyCellType()
                     ? () {
                         if (levelDataBloc.usingAnyCellType()) {
-                          gotoLevelScreen(context, levelDataBloc);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LevelScreen(
+                                      levelSequencer: levelDataBloc,
+                                      levelScreenStrings: LevelScreenStrings(
+                                        title: "Free Play",
+                                        nextLevelTitle: "Level completed!",
+                                        nextLevelContent: "Play new level?",
+                                        nextLevelAffirmative: "Yes",
+                                        nextLevelNegative: "No",
+                                        noNextLevelTitle: "Level completed!",
+                                        noNextLevelConfirm: "Ok",
+                                      ),
+                                    )),
+                          );
                         }
                       }
                     : null,
@@ -60,20 +75,5 @@ class _FreePlayWidget extends StatelessWidget {
       ],
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     );
-  }
-
-  gotoLevelScreen(
-      BuildContext context, FreePlayLevelDataBloc levelDataBloc) async {
-    bool continuePlaying = true;
-    while (continuePlaying != null && continuePlaying) {
-      levelDataBloc.getNextLevel();
-      continuePlaying = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => LevelScreen(
-                  levelSequencer: levelDataBloc,
-                )),
-      );
-    }
   }
 }

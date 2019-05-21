@@ -50,6 +50,8 @@ class BoardBloc {
 
   CellType getCellType(int i, int j) => _board.getCellType(i, j);
 
+  bool hasNextLevel() => _levelSequencer.hasNextLevel();
+
   _transform(BoardEvent event) {
     if (event is FlipEvent) {
       _board.flip(event.i, event.j);

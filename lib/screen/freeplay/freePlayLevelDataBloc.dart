@@ -97,6 +97,8 @@ class FreePlayLevelDataBloc with LevelSequencer {
     return _levelData;
   }
 
+  bool hasNextLevel() => true;
+
   CellType _randomCellType() =>
       _cellTypes.elementAt(_rng.nextInt(_cellTypes.length));
 

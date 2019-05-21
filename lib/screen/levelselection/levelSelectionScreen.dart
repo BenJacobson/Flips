@@ -43,6 +43,15 @@ class _LevelSelectionWidget extends StatelessWidget {
                               levelPackIndex, levelDataIndex);
                           return LevelScreen(
                             levelSequencer: levelSelectionBloc,
+                            levelScreenStrings: LevelScreenStrings(
+                              title: "Levels",
+                              nextLevelTitle: "Level completed!",
+                              nextLevelContent: "Play next level?",
+                              nextLevelAffirmative: "Yes",
+                              nextLevelNegative: "No",
+                              noNextLevelTitle: "Level completed!",
+                              noNextLevelConfirm: "Ok",
+                            ),
                           );
                         },
                       ));
