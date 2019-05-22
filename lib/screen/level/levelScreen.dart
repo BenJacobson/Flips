@@ -34,6 +34,7 @@ class LevelScreen extends StatelessWidget {
 
 class _Level extends StatelessWidget {
   final LevelScreenStrings levelScreenStrings;
+  final double iconSize = 36.0;
 
   _Level({
     @required this.levelScreenStrings,
@@ -55,7 +56,7 @@ class _Level extends StatelessWidget {
         (timestamp) => boardBloc.eventSink.add(PushEvent()));
     return Column(
       children: <Widget>[
-        buildOptionBar(boardBloc),
+        buildOptionBar(context, boardBloc),
         Spacer(),
         BoardWidget(),
         Spacer(),
@@ -65,9 +66,33 @@ class _Level extends StatelessWidget {
     );
   }
 
-  Widget buildOptionBar(BoardBloc boardBloc) {
+  Widget buildOptionBar(BuildContext context, BoardBloc boardBloc) {
     return Row(
       children: <Widget>[
+        StreamBuilder(
+            stream: boardBloc.historyStream,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              bool canUndo = snapshot.hasData && snapshot.data.canUndo;
+              return IconButton(
+                color: Theme.of(context).accentColor,
+                icon: Icon(Icons.undo),
+                iconSize: iconSize,
+                onPressed:
+                    canUndo ? () => boardBloc.eventSink.add(UndoEvent()) : null,
+              );
+            }),
+        StreamBuilder(
+            stream: boardBloc.historyStream,
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              bool canRedo = snapshot.hasData && snapshot.data.canRedo;
+              return IconButton(
+                color: Theme.of(context).accentColor,
+                icon: Icon(Icons.redo),
+                iconSize: iconSize,
+                onPressed:
+                    canRedo ? () => boardBloc.eventSink.add(RedoEvent()) : null,
+              );
+            }),
         Spacer(),
         StreamBuilder(
           stream: boardBloc.showHintsStream,
@@ -76,7 +101,7 @@ class _Level extends StatelessWidget {
             return IconButton(
               color: Theme.of(context).accentColor,
               icon: Icon(showHints ? Icons.grid_off : Icons.grid_on),
-              iconSize: 36.0,
+              iconSize: iconSize,
               onPressed: () => BoardBlocInheritedWidget.of(context)
                   .boardBloc
                   .eventSink

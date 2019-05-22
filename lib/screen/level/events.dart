@@ -17,4 +17,8 @@ class NextLevelEvent extends BoardEvent {}
 
 class PushEvent extends BoardEvent {}
 
+class RedoEvent extends BoardEvent {}
+
 class ResetEvent extends BoardEvent {}
+
+class UndoEvent extends BoardEvent {}
