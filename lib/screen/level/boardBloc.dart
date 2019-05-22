@@ -8,18 +8,18 @@ import 'dart:async';
 import 'dart:collection';
 
 class BoardBloc {
-  static const MAX_HISTORY_LENGTH = 100;
+  static const int MAX_HISTORY_LENGTH = 100;
 
   final Board _board;
   final LevelSequencer _levelSequencer;
-  final Queue<FlipEvent> moveHistory = Queue();
+  final Queue<FlipEvent> _moveHistory = Queue();
   final _boardEventController = StreamController<BoardEvent>();
   final _historyStreamController = StreamController<HistoryState>.broadcast();
   final _immutableBoardStreamController =
       StreamController<ImmutableBoard>.broadcast();
   final _showHintsStreamController = StreamController<bool>.broadcast();
   bool _showHints = false;
-  int moveHistoryIndex = 0;
+  int _moveHistoryIndex = 0;
 
   StreamSink<BoardEvent> get eventSink => _boardEventController.sink;
 
@@ -64,17 +64,17 @@ class BoardBloc {
       if (_board.isCompleted()) {
         _board.levelData.setCompleted(true);
       }
-      while (moveHistory.length > moveHistoryIndex) {
-        moveHistory.removeLast();
+      while (_moveHistory.length > _moveHistoryIndex) {
+        _moveHistory.removeLast();
       }
-      moveHistory.addLast(event);
-      while (moveHistory.length > MAX_HISTORY_LENGTH) {
-        moveHistory.removeFirst();
+      _moveHistory.addLast(event);
+      while (_moveHistory.length > MAX_HISTORY_LENGTH) {
+        _moveHistory.removeFirst();
       }
-      moveHistoryIndex = moveHistory.length;
+      _moveHistoryIndex = _moveHistory.length;
       _historySink.add(HistoryState(
-        canRedo: moveHistoryIndex < moveHistory.length,
-        canUndo: moveHistoryIndex > 0,
+        canRedo: _moveHistoryIndex < _moveHistory.length,
+        canUndo: _moveHistoryIndex > 0,
       ));
     } else if (event is HintsEvent) {
       _showHints = event.showHints;
@@ -84,49 +84,49 @@ class BoardBloc {
       _showHintsSink.add(_showHints);
       _board.loadLevelData(_levelSequencer.getNextLevel());
       _boardSink.add(_board);
-      moveHistory.clear();
-      moveHistoryIndex = 0;
+      _moveHistory.clear();
+      _moveHistoryIndex = 0;
       _historySink.add(HistoryState(
-        canRedo: moveHistoryIndex < moveHistory.length,
-        canUndo: moveHistoryIndex > 0,
+        canRedo: _moveHistoryIndex < _moveHistory.length,
+        canUndo: _moveHistoryIndex > 0,
       ));
     } else if (event is PushEvent) {
       _showHintsSink.add(_showHints);
       _boardSink.add(_board);
       _historySink.add(HistoryState(
-        canRedo: moveHistoryIndex < moveHistory.length,
-        canUndo: moveHistoryIndex > 0,
+        canRedo: _moveHistoryIndex < _moveHistory.length,
+        canUndo: _moveHistoryIndex > 0,
       ));
     } else if (event is RedoEvent) {
-      assert(moveHistoryIndex < moveHistory.length);
-      FlipEvent event = moveHistory.elementAt(moveHistoryIndex);
+      assert(_moveHistoryIndex < _moveHistory.length);
+      FlipEvent event = _moveHistory.elementAt(_moveHistoryIndex);
       _board.flip(event.i, event.j);
       _boardSink.add(_board);
-      moveHistoryIndex++;
+      _moveHistoryIndex++;
       _historySink.add(HistoryState(
-        canRedo: moveHistoryIndex < moveHistory.length,
-        canUndo: moveHistoryIndex > 0,
+        canRedo: _moveHistoryIndex < _moveHistory.length,
+        canUndo: _moveHistoryIndex > 0,
       ));
     } else if (event is ResetEvent) {
       _showHints = false;
       _showHintsSink.add(_showHints);
       _board.reset();
       _boardSink.add(_board);
-      moveHistory.clear();
-      moveHistoryIndex = 0;
+      _moveHistory.clear();
+      _moveHistoryIndex = 0;
       _historySink.add(HistoryState(
-        canRedo: moveHistoryIndex < moveHistory.length,
-        canUndo: moveHistoryIndex > 0,
+        canRedo: _moveHistoryIndex < _moveHistory.length,
+        canUndo: _moveHistoryIndex > 0,
       ));
     } else if (event is UndoEvent) {
-      assert(moveHistoryIndex > 0);
-      moveHistoryIndex--;
-      FlipEvent event = moveHistory.elementAt(moveHistoryIndex);
+      assert(_moveHistoryIndex > 0);
+      _moveHistoryIndex--;
+      FlipEvent event = _moveHistory.elementAt(_moveHistoryIndex);
       _board.flip(event.i, event.j);
       _boardSink.add(_board);
       _historySink.add(HistoryState(
-        canRedo: moveHistoryIndex < moveHistory.length,
-        canUndo: moveHistoryIndex > 0,
+        canRedo: _moveHistoryIndex < _moveHistory.length,
+        canUndo: _moveHistoryIndex > 0,
       ));
     } else {
       print("Error: unknown board event received");
