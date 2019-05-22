@@ -48,6 +48,7 @@ class _FreePlayWidget extends StatelessWidget {
                 onPressed: levelDataBloc.usingAnyCellType()
                     ? () {
                         if (levelDataBloc.usingAnyCellType()) {
+                          levelDataBloc.getNextLevel();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
