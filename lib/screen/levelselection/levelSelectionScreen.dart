@@ -46,11 +46,16 @@ class _LevelSelectionWidget extends StatelessWidget {
                             levelScreenStrings: LevelScreenStrings(
                               title: "Levels",
                               nextLevelTitle: "Level completed!",
-                              nextLevelContent: "Play next level?",
+                              nextLevelContent: "Play the next level?",
                               nextLevelAffirmative: "Yes",
                               nextLevelNegative: "No",
                               noNextLevelTitle: "Level completed!",
                               noNextLevelConfirm: "Ok",
+                              resetLevelTitle: "Reset?",
+                              resetLevelContent:
+                                  "Reset the level to its original state?",
+                              resetLevelAffirmative: "Yes",
+                              resetLevelNegative: "No",
                             ),
                           );
                         },

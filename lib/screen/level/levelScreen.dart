@@ -99,6 +99,22 @@ class _Level extends StatelessWidget {
                 );
               }),
           Spacer(),
+          IconButton(
+              color: Theme.of(context).accentColor,
+              icon: Icon(Icons.refresh),
+              iconSize: iconSize,
+              onPressed: () async {
+                bool reset = await showDialog(
+                  context: context,
+                  builder: buildResetConfirmDialog,
+                );
+                if (reset != null && reset) {
+                  BoardBlocInheritedWidget.of(context)
+                      .boardBloc
+                      .eventSink
+                      .add(ResetEvent());
+                }
+              }),
           StreamBuilder(
             stream: boardBloc.showHintsStream,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -122,6 +138,29 @@ class _Level extends StatelessWidget {
         right: sideOptionMargin,
         bottom: topBottomOptionMargin,
       ),
+    );
+  }
+
+  Widget buildResetConfirmDialog(BuildContext context) {
+    return AlertDialog(
+      actions: <Widget>[
+        FlatButton(
+          child: Text(levelScreenStrings.resetLevelNegative),
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+          textColor: Colors.black,
+        ),
+        FlatButton(
+          child: Text(levelScreenStrings.resetLevelAffirmative),
+          onPressed: () {
+            Navigator.of(context).pop(true);
+          },
+          textColor: Colors.black,
+        ),
+      ],
+      content: Text(levelScreenStrings.resetLevelContent),
+      title: Text(levelScreenStrings.resetLevelTitle),
     );
   }
 
@@ -175,6 +214,10 @@ class LevelScreenStrings {
   final String nextLevelNegative;
   final String noNextLevelTitle;
   final String noNextLevelConfirm;
+  final String resetLevelTitle;
+  final String resetLevelContent;
+  final String resetLevelAffirmative;
+  final String resetLevelNegative;
 
   LevelScreenStrings({
     @required this.title,
@@ -184,11 +227,19 @@ class LevelScreenStrings {
     @required this.nextLevelNegative,
     @required this.noNextLevelTitle,
     @required this.noNextLevelConfirm,
+    @required this.resetLevelTitle,
+    @required this.resetLevelContent,
+    @required this.resetLevelAffirmative,
+    @required this.resetLevelNegative,
   })  : assert(title != null),
         assert(nextLevelTitle != null),
         assert(nextLevelContent != null),
         assert(nextLevelAffirmative != null),
         assert(nextLevelNegative != null),
         assert(noNextLevelTitle != null),
-        assert(noNextLevelConfirm != null);
+        assert(noNextLevelConfirm != null),
+        assert(resetLevelTitle != null),
+        assert(resetLevelContent != null),
+        assert(resetLevelAffirmative != null),
+        assert(resetLevelNegative != null);
 }

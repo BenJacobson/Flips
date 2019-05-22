@@ -57,11 +57,16 @@ class _FreePlayWidget extends StatelessWidget {
                                       levelScreenStrings: LevelScreenStrings(
                                         title: "Free Play",
                                         nextLevelTitle: "Level completed!",
-                                        nextLevelContent: "Play new level?",
+                                        nextLevelContent: "Play a new level?",
                                         nextLevelAffirmative: "Yes",
                                         nextLevelNegative: "No",
                                         noNextLevelTitle: "Level completed!",
                                         noNextLevelConfirm: "Ok",
+                                        resetLevelTitle: "Reset?",
+                                        resetLevelContent:
+                                            "Reset the level to its original state?",
+                                        resetLevelAffirmative: "Yes",
+                                        resetLevelNegative: "No",
                                       ),
                                     )),
                           );
