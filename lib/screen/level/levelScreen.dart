@@ -35,6 +35,8 @@ class LevelScreen extends StatelessWidget {
 class _Level extends StatelessWidget {
   final LevelScreenStrings levelScreenStrings;
   final double iconSize = 36.0;
+  final double sideOptionMargin = 10.0;
+  final double topBottomOptionMargin = 5.0;
 
   _Level({
     @required this.levelScreenStrings,
@@ -56,10 +58,10 @@ class _Level extends StatelessWidget {
         (timestamp) => boardBloc.eventSink.add(PushEvent()));
     return Column(
       children: <Widget>[
-        buildOptionBar(context, boardBloc),
         Spacer(),
         BoardWidget(),
         Spacer(),
+        buildOptionBar(context, boardBloc),
       ],
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -67,49 +69,59 @@ class _Level extends StatelessWidget {
   }
 
   Widget buildOptionBar(BuildContext context, BoardBloc boardBloc) {
-    return Row(
-      children: <Widget>[
-        StreamBuilder(
-            stream: boardBloc.historyStream,
+    return Container(
+      child: Row(
+        children: <Widget>[
+          StreamBuilder(
+              stream: boardBloc.historyStream,
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                bool canUndo = snapshot.hasData && snapshot.data.canUndo;
+                return IconButton(
+                  color: Theme.of(context).accentColor,
+                  icon: Icon(Icons.undo),
+                  iconSize: iconSize,
+                  onPressed: canUndo
+                      ? () => boardBloc.eventSink.add(UndoEvent())
+                      : null,
+                );
+              }),
+          StreamBuilder(
+              stream: boardBloc.historyStream,
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                bool canRedo = snapshot.hasData && snapshot.data.canRedo;
+                return IconButton(
+                  color: Theme.of(context).accentColor,
+                  icon: Icon(Icons.redo),
+                  iconSize: iconSize,
+                  onPressed: canRedo
+                      ? () => boardBloc.eventSink.add(RedoEvent())
+                      : null,
+                );
+              }),
+          Spacer(),
+          StreamBuilder(
+            stream: boardBloc.showHintsStream,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              bool canUndo = snapshot.hasData && snapshot.data.canUndo;
+              bool showHints = snapshot.hasData && snapshot.data;
               return IconButton(
                 color: Theme.of(context).accentColor,
-                icon: Icon(Icons.undo),
+                icon: Icon(showHints ? Icons.grid_off : Icons.grid_on),
                 iconSize: iconSize,
-                onPressed:
-                    canUndo ? () => boardBloc.eventSink.add(UndoEvent()) : null,
+                onPressed: () => BoardBlocInheritedWidget.of(context)
+                    .boardBloc
+                    .eventSink
+                    .add(HintsEvent(!snapshot.data)),
               );
-            }),
-        StreamBuilder(
-            stream: boardBloc.historyStream,
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              bool canRedo = snapshot.hasData && snapshot.data.canRedo;
-              return IconButton(
-                color: Theme.of(context).accentColor,
-                icon: Icon(Icons.redo),
-                iconSize: iconSize,
-                onPressed:
-                    canRedo ? () => boardBloc.eventSink.add(RedoEvent()) : null,
-              );
-            }),
-        Spacer(),
-        StreamBuilder(
-          stream: boardBloc.showHintsStream,
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            bool showHints = snapshot.hasData && snapshot.data;
-            return IconButton(
-              color: Theme.of(context).accentColor,
-              icon: Icon(showHints ? Icons.grid_off : Icons.grid_on),
-              iconSize: iconSize,
-              onPressed: () => BoardBlocInheritedWidget.of(context)
-                  .boardBloc
-                  .eventSink
-                  .add(HintsEvent(!snapshot.data)),
-            );
-          },
-        ),
-      ],
+            },
+          ),
+        ],
+      ),
+      margin: EdgeInsets.only(
+        left: sideOptionMargin,
+        top: topBottomOptionMargin,
+        right: sideOptionMargin,
+        bottom: topBottomOptionMargin,
+      ),
     );
   }
 
