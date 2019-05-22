@@ -55,12 +55,36 @@ class _Level extends StatelessWidget {
         (timestamp) => boardBloc.eventSink.add(PushEvent()));
     return Column(
       children: <Widget>[
+        buildOptionBar(boardBloc),
+        Spacer(),
         BoardWidget(),
-        SizedBox(height: 50),
-        _ShowHintsWidget(),
+        Spacer(),
       ],
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
+    );
+  }
+
+  Widget buildOptionBar(BoardBloc boardBloc) {
+    return Row(
+      children: <Widget>[
+        Spacer(),
+        StreamBuilder(
+          stream: boardBloc.showHintsStream,
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            bool showHints = snapshot.hasData && snapshot.data;
+            return IconButton(
+              color: Theme.of(context).accentColor,
+              icon: Icon(showHints ? Icons.grid_off : Icons.grid_on),
+              iconSize: 36.0,
+              onPressed: () => BoardBlocInheritedWidget.of(context)
+                  .boardBloc
+                  .eventSink
+                  .add(HintsEvent(!snapshot.data)),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -103,42 +127,6 @@ class _Level extends StatelessWidget {
         title: Text(levelScreenStrings.noNextLevelTitle),
       );
     }
-  }
-}
-
-class _ShowHintsWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: BoardBlocInheritedWidget.of(context).boardBloc.showHintsStream,
-      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-        if (snapshot.hasData) {
-          return GestureDetector(
-            child: Row(
-              children: [
-                Switch(
-                  onChanged: (newShowHints) =>
-                      BoardBlocInheritedWidget.of(context)
-                          .boardBloc
-                          .eventSink
-                          .add(HintsEvent(newShowHints)),
-                  value: snapshot.data,
-                ),
-                Text("Show hints",
-                    style: TextStyle(
-                        color: Theme.of(context).accentColor, fontSize: 24)),
-              ],
-              mainAxisAlignment: MainAxisAlignment.center,
-            ),
-            onTap: () => BoardBlocInheritedWidget.of(context)
-                .boardBloc
-                .eventSink
-                .add(HintsEvent(!snapshot.data)),
-          );
-        }
-        return Container();
-      },
-    );
   }
 }
 
