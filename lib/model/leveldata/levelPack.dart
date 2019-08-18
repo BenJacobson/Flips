@@ -1,4 +1,3 @@
-import 'package:flips/model/board/cell.dart';
 import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flutter/material.dart';
 
@@ -12,15 +11,8 @@ class LevelPack {
         .map((level) => level.trim())
         .where((level) => level.isNotEmpty)
         .toList();
-    assert(lines.length == 22);
 
-    Set<CellType> cellTypes = lines[0]
-        .trim()
-        .split('')
-        .map((c) => Cell.deserializeCellType(c))
-        .toSet();
-
-    List<int> size = lines[1]
+    List<int> size = lines[0]
         .split(' ')
         .map((n) => n.trim())
         .map((n) => int.parse(n))
@@ -31,12 +23,8 @@ class LevelPack {
     int width = size[1];
 
     int levelNumber = 1;
-    List<LevelData> levelData = await Future.wait(lines.skip(2).map((line) {
+    List<LevelData> levelData = await Future.wait(lines.skip(1).map((line) {
       line = line.trim();
-      assert(line.split('').fold(
-          true,
-          (bool good, String c) =>
-              cellTypes.contains(Cell.deserializeCellType(c)) && good));
       return LevelData.fromSerializedLevelData(
         height: height,
         width: width,
@@ -48,7 +36,6 @@ class LevelPack {
     }));
 
     return LevelPack._internal(
-      cellTypes: cellTypes,
       levelData: levelData,
       height: height,
       width: width,
@@ -56,19 +43,16 @@ class LevelPack {
   }
 
   final List<LevelData> _levelData;
-  final Set<CellType> _cellTypes;
   final int height;
   final int width;
 
   int _numCompleted = 0;
 
   LevelPack._internal({
-    @required cellTypes,
     @required levelData,
     @required this.height,
     @required this.width,
-  })  : _cellTypes = cellTypes,
-        _levelData = levelData {
+  }) : _levelData = levelData {
     _levelData.forEach((levelData) {
       if (levelData.completed) {
         _numCompleted++;
@@ -81,6 +65,4 @@ class LevelPack {
   int get numCompleted => _numCompleted;
 
   LevelData operator [](int index) => _levelData[index];
-
-  bool usesCellType(CellType cellType) => _cellTypes.contains(cellType);
 }

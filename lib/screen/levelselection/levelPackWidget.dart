@@ -27,6 +27,8 @@ class LevelPackWidget extends StatelessWidget {
     );
   }
 
+  // TODO: cell type widgets will be removed when levels are reorganized into
+  // easy, medium, and hard.
   Iterable<Widget> generateCellWidgets(BuildContext context) sync* {
     bool first = true;
     for (final cellType in CellType.values) {
@@ -37,9 +39,7 @@ class LevelPackWidget extends StatelessWidget {
           width: 10.0,
         );
       }
-      Color color = levelPack.usesCellType(cellType)
-          ? Cell.colorForType(cellType)
-          : Theme.of(context).disabledColor;
+      Color color = Cell.colorForType(cellType);
       yield Container(
         color: color,
         height: 40.0,
