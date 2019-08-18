@@ -1,6 +1,7 @@
 import 'package:flips/screen/freeplay/freePlayScreen.dart';
 import 'package:flips/screen/home/flipsLogo.dart';
 import 'package:flips/screen/levelselection/levelSelectionScreen.dart';
+import 'package:flips/screen/tutorial/tutorialScreen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -22,7 +23,9 @@ class _Home extends StatelessWidget {
     return Center(
       child: Column(
         children: [
+          Spacer(),
           FlipsLogo(),
+          Spacer(),
           Wrap(
             children: [
               FlatButton(
@@ -62,8 +65,23 @@ class _Home extends StatelessWidget {
             direction: Axis.vertical,
             spacing: 40.0,
           ),
+          Spacer(),
+          Row(
+            children: [
+              IconButton(
+                color: Theme.of(context).primaryColor,
+                icon: Icon(Icons.help_outline),
+                iconSize: 48.0,
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TutorialScreen()));
+                },
+              )
+            ],
+          ),
         ],
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       ),
     );
   }
