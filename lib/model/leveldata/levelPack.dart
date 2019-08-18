@@ -1,3 +1,4 @@
+import 'package:flips/global/preferences.dart';
 import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flutter/material.dart';
 
@@ -23,8 +24,9 @@ class LevelPack {
     int width = size[1];
 
     int levelNumber = 1;
-    List<LevelData> levelData = await Future.wait(lines.skip(1).map((line) {
+    List<LevelData> levelData = await Future.wait(lines.skip(1).map((line) async {
       line = line.trim();
+      bool completed = await Preferences.getLevelCompleted(line);
       return LevelData.fromSerializedLevelData(
         height: height,
         width: width,
@@ -32,6 +34,7 @@ class LevelPack {
         displayName: levelNameGenerator != null
             ? levelNameGenerator(levelNumber++)
             : null,
+        completed: completed,
       );
     }));
 

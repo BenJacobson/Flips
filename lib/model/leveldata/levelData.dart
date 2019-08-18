@@ -3,16 +3,15 @@ import 'package:flips/model/board/cell.dart';
 import 'package:flutter/material.dart';
 
 class LevelData {
-  static Future<LevelData> fromSerializedLevelData({
-    int height,
-    int width,
-    String serializedLevelData,
-    String displayName,
-  }) async {
+  static LevelData fromSerializedLevelData({
+    @required int height,
+    @required int width,
+    @required String serializedLevelData,
+    @required String displayName,
+    @required bool completed,
+  }) {
     assert(serializedLevelData != null);
     assert(width * height == serializedLevelData.length, serializedLevelData);
-    bool levelCompleted =
-        await Preferences.getLevelCompleted(serializedLevelData);
     List<List<LevelCell>> cells = Iterable.generate(height, (i) {
       return Iterable.generate(width, (j) {
         String c = serializedLevelData[i * width + j];
@@ -24,7 +23,7 @@ class LevelData {
     }).toList();
     return LevelData(
       cells: cells,
-      completed: levelCompleted,
+      completed: completed,
       serializedLevelData: serializedLevelData,
       displayName: displayName,
     );
