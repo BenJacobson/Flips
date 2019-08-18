@@ -2,9 +2,11 @@ import 'package:flips/model/board/cell.dart';
 import 'package:flips/model/leveldata/levelData.dart';
 import 'package:flutter/material.dart';
 
+typedef LevelNameGenerator = String Function(int);
+
 class LevelPack {
   static Future<LevelPack> fromSerializedLevelPack(
-      String serializedLevelPack) async {
+      String serializedLevelPack, LevelNameGenerator levelNameGenerator) async {
     List<String> lines = serializedLevelPack
         .split('\n')
         .map((level) => level.trim())
@@ -28,13 +30,21 @@ class LevelPack {
     int height = size[0];
     int width = size[1];
 
+    int levelNumber = 1;
     List<LevelData> levelData = await Future.wait(lines.skip(2).map((line) {
       line = line.trim();
       assert(line.split('').fold(
           true,
           (bool good, String c) =>
               cellTypes.contains(Cell.deserializeCellType(c)) && good));
-      return LevelData.fromSerializedLevelData(height, width, line);
+      return LevelData.fromSerializedLevelData(
+        height: height,
+        width: width,
+        serializedLevelData: line,
+        displayName: levelNameGenerator != null
+            ? levelNameGenerator(levelNumber++)
+            : null,
+      );
     }));
 
     return LevelPack._internal(

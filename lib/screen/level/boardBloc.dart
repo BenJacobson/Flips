@@ -43,6 +43,9 @@ class BoardBloc {
 
   int get height => _board.height;
 
+  String get currentDisplayName =>
+      _levelSequencer.getCurrentLevel().displayName;
+
   BoardBloc(LevelSequencer levelSequencer)
       : _board = Board(
           levelData: levelSequencer.getCurrentLevel(),

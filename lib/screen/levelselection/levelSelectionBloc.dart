@@ -27,12 +27,12 @@ class LevelSelectionBloc with LevelSequencer {
   }
 
   void setLevel(int levelPackIndex, int levelDataIndex) {
-    if (!isInRange(levelPackIndex, 0, levelPackOrder.length-1)) {
+    if (!isInRange(levelPackIndex, 0, levelPackOrder.length - 1)) {
       return;
     }
 
     LevelPack levelPack = levelPacks[levelPackOrder[_levelPackIndex]];
-    if (!isInRange(levelDataIndex, 0, levelPack.numLevels-1)) {
+    if (!isInRange(levelDataIndex, 0, levelPack.numLevels - 1)) {
       return;
     }
 
@@ -41,12 +41,12 @@ class LevelSelectionBloc with LevelSequencer {
   }
 
   LevelData getCurrentLevel() {
-    if (!isInRange(_levelPackIndex, 0, levelPackOrder.length-1)) {
+    if (!isInRange(_levelPackIndex, 0, levelPackOrder.length - 1)) {
       return null;
     }
 
     LevelPack levelPack = levelPacks[levelPackOrder[_levelPackIndex]];
-    if (!isInRange(_levelDataIndex, 0, levelPack.numLevels-1)) {
+    if (!isInRange(_levelDataIndex, 0, levelPack.numLevels - 1)) {
       return null;
     }
 
@@ -54,20 +54,20 @@ class LevelSelectionBloc with LevelSequencer {
   }
 
   LevelData getNextLevel() {
-    if (!isInRange(_levelPackIndex, 0, levelPackOrder.length-1)) {
+    if (!isInRange(_levelPackIndex, 0, levelPackOrder.length - 1)) {
       return null;
     }
 
     _levelDataIndex++;
     LevelPack levelPack = levelPacks[levelPackOrder[_levelPackIndex]];
-    if (!isInRange(_levelDataIndex, 0, levelPack.numLevels-1)) {
+    if (!isInRange(_levelDataIndex, 0, levelPack.numLevels - 1)) {
       _levelPackIndex++;
       _levelDataIndex = 0;
-      if (!isInRange(_levelPackIndex, 0, levelPackOrder.length-1)) {
+      if (!isInRange(_levelPackIndex, 0, levelPackOrder.length - 1)) {
         return null;
       }
       levelPack = levelPacks[levelPackOrder[_levelPackIndex]];
-      if (!isInRange(_levelDataIndex, 0, levelPack.numLevels-1)) {
+      if (!isInRange(_levelDataIndex, 0, levelPack.numLevels - 1)) {
         return null;
       }
     }
@@ -76,18 +76,18 @@ class LevelSelectionBloc with LevelSequencer {
   }
 
   bool hasNextLevel() {
-    if (!isInRange(_levelPackIndex, 0, levelPackOrder.length-1)) {
+    if (!isInRange(_levelPackIndex, 0, levelPackOrder.length - 1)) {
       return false;
     }
     LevelPack levelPack = levelPacks[levelPackOrder[_levelPackIndex]];
-    if (isInRange(_levelDataIndex+1, 0, levelPack.numLevels-1)) {
+    if (isInRange(_levelDataIndex + 1, 0, levelPack.numLevels - 1)) {
       return true;
     }
-    if (!isInRange(_levelPackIndex+1, 0, levelPackOrder.length-1)) {
+    if (!isInRange(_levelPackIndex + 1, 0, levelPackOrder.length - 1)) {
       return false;
     }
-    levelPack = levelPacks[levelPackOrder[_levelPackIndex+1]];
-    return isInRange(0, 0, levelPack.numLevels-1);
+    levelPack = levelPacks[levelPackOrder[_levelPackIndex + 1]];
+    return isInRange(0, 0, levelPack.numLevels - 1);
   }
 
   Future<void> _loadLevels() async {
@@ -100,8 +100,8 @@ class LevelSelectionBloc with LevelSequencer {
     await Future.wait(levelPackOrder.map((levelPackFile) async {
       String serializedLevelPack = await _loadFile(levelPackFile);
       if (serializedLevelPack != null) {
-        LevelPack levelPack =
-            await LevelPack.fromSerializedLevelPack(serializedLevelPack);
+        LevelPack levelPack = await LevelPack.fromSerializedLevelPack(
+            serializedLevelPack, (levelNum) => "Level $levelNum");
         levelPacks.putIfAbsent(levelPackFile, () => levelPack);
       }
     }));
